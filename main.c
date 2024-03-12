@@ -9,7 +9,7 @@ int main()
     listarBaralho(cartas);
     Manilha* p1;
     distribuir_baralho(cartas, &p1, 10);
-    printf("prox");
+    printf("\nprox\n");
     listarManilha(p1);
 
     return 0;
