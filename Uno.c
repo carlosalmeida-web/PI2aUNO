@@ -5,7 +5,7 @@
 
 #include "Uno.h"
 
-#define BARALHO_SIZE 108
+//#define BARALHO_SIZE 108
 
 
 
