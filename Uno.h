@@ -15,6 +15,7 @@ void adicionarCarta(Baralho *baralho, Carta carta);
 Carta pegarCarta(Baralho *baralho);
 void listarBaralho(Baralho *cartas);
 void listarManilha(Manilha *cartas);
+Manilha *inicializarManilha();
 void distribuir_baralho(Baralho *baralho, Manilha **manilha, int quant);
 void embaralhar(Baralho *cartas);
 void embaralhar_matriz(char matrix[2][BARALHO_SIZE]);

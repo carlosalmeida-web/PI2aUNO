@@ -54,6 +54,7 @@ static const char * const tipoCarta[] = {
 
 typedef struct manilha
 {
+    unsigned int *qtd;
     Carta carta;
     struct manilha *prox, *ant;
 } Manilha;
@@ -115,10 +116,22 @@ void listarBaralho(Baralho *cartas){
 }
 
 void listarManilha(Manilha *cartas) {
+    int i;
     while (cartas != NULL) {
         printf("Número: %s, Categoria: %c\n", tipoCarta[cartas->carta.numero], cartas->carta.categoria);
+        printf("quantidade: %d\n", *(cartas->qtd));
         cartas = cartas->prox;
     }
+}
+
+Manilha *inicializarManilha() {
+    Manilha *manilha = (Manilha*)malloc(sizeof(Manilha));
+    manilha->qtd = (unsigned int*)malloc(sizeof(unsigned int));
+    *(manilha->qtd) = 0;
+    manilha->prox = NULL;
+    manilha->ant = NULL;
+
+    return manilha;
 }
 
 void distribuir_baralho(Baralho *baralho, Manilha **manilha, int quant) {
@@ -129,24 +142,30 @@ void distribuir_baralho(Baralho *baralho, Manilha **manilha, int quant) {
 
     for (int i = 0; i < quant; i++) {
         Carta carta = baralho->carta[baralho->topo];
-        baralho->topo--; // reduz o topo
+        baralho->topo--;
 
-        
         Manilha *novoNo = (Manilha*)malloc(sizeof(Manilha));
-        novoNo->carta = carta; // define a nova carta
-        novoNo->prox = *manilha; // aponta para a posição atual da manilha
-        novoNo->ant = NULL; // define o anterior como NULL para evitar lixo de memoria
+        novoNo->qtd = (*manilha)->qtd; // Usa o mesmo ponteiro qtd da manilha
 
-        if (*manilha != NULL) {
-            (*manilha)->ant = novoNo; // faz a posição atual da manilha apontar devolta para o novoNo
+        if (NULL == (*manilha)->prox){
+            novoNo->ant = novoNo;
+            novoNo->prox = novoNo;
+            *manilha = novoNo;
+        } else {
+            novoNo->ant = (*manilha)->ant;
+            novoNo->prox = *manilha;
+            (*manilha)->ant->prox = novoNo;
+            (*manilha)->ant = novoNo;
         }
-
-        *manilha = novoNo; // faz com que a nova posição inicial da manilha seja o novoNo
-
-        printf("\nnovoNo: %p\n", novoNo);
-        printf("\nManilha: %p\n", *manilha);
+        novoNo->carta = carta;
+        (*(novoNo->qtd))++; // Incrementa a quantidade de cartas na manilha
     }
 }
+
+
+
+
+
 
 void embaralhar_matriz(char matrix[2][BARALHO_SIZE]) {
     srand(time(NULL));

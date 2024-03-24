@@ -7,8 +7,10 @@ int main()
 
     Baralho* cartas = criar_baralho();
     listarBaralho(cartas);
-    Manilha* p1;
-    distribuir_baralho(cartas, &p1, 10);
+    Manilha* p1 = inicializarManilha();
+    printf("tesrt");
+    distribuir_baralho(cartas, &p1, 14);
+    system("pause");
     printf("\nprox\n");
     listarManilha(p1);
 
