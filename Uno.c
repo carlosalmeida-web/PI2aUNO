@@ -136,36 +136,39 @@ Manilha *inicializarManilha() {
 
 void distribuir_baralho(Baralho *baralho, Manilha **manilha, int quant) {
     if (baralhoVazio(baralho)) {
+
         printf("\nErro: Baralho Vazio, não foi possível transferir %d Cartas para a manilha\n", quant);
         return;
+
     }
 
-    for (int i = 0; i < quant; i++) {
+    for (;quant > 0; quant--) {
+
         Carta carta = baralho->carta[baralho->topo];
         baralho->topo--;
 
         Manilha *novoNo = (Manilha*)malloc(sizeof(Manilha));
         novoNo->qtd = (*manilha)->qtd; // Usa o mesmo ponteiro qtd da manilha
 
-        if (NULL == (*manilha)->prox){
+        if ((*manilha)->prox == NULL){
+            
             novoNo->ant = novoNo;
             novoNo->prox = novoNo;
             *manilha = novoNo;
+
         } else {
+
             novoNo->ant = (*manilha)->ant;
             novoNo->prox = *manilha;
             (*manilha)->ant->prox = novoNo;
             (*manilha)->ant = novoNo;
+
         }
+
         novoNo->carta = carta;
         (*(novoNo->qtd))++; // Incrementa a quantidade de cartas na manilha
     }
 }
-
-
-
-
-
 
 void embaralhar_matriz(char matrix[2][BARALHO_SIZE]) {
     srand(time(NULL));
