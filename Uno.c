@@ -116,12 +116,13 @@ void listarBaralho(Baralho *cartas){
 }
 
 void listarManilha(Manilha *cartas) {
-    int i;
-    while (cartas != NULL) {
+    //Manilha *carta = (Manilha*)malloc(sizeof(Manilha));
+    Manilha *carta = cartas;
+    do{
         printf("Número: %s, Categoria: %c\n", tipoCarta[cartas->carta.numero], cartas->carta.categoria);
         printf("quantidade: %d\n", *(cartas->qtd));
         cartas = cartas->prox;
-    }
+    }while (cartas != NULL && cartas != carta);
 }
 
 Manilha *inicializarManilha() {
