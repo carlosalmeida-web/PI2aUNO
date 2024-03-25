@@ -60,10 +60,10 @@ typedef struct manilha
 } Manilha;
 
 typedef struct jogador{
-char nome;
+char nome[25];
 unsigned int vitorias;
-struct *manilha;
-int qtd_cartas;
+manilha *cartas;
+jogador *prox, *ant;
 }
 
 //
