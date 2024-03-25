@@ -59,6 +59,13 @@ typedef struct manilha
     struct manilha *prox, *ant;
 } Manilha;
 
+typedef struct jogador{
+char nome;
+unsigned int vitorias;
+struct *manilha;
+int qtd_cartas;
+}
+
 //
 typedef struct baralho {
     Carta carta[BARALHO_SIZE];
