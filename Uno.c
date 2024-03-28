@@ -56,15 +56,19 @@ typedef struct manilha
 {
     unsigned int *qtd;
     Carta carta;
-    struct manilha *prox, *ant;
+    struct manilha *ant, *prox;
 } Manilha;
 
-typedef struct jogador{
-char nome[25];
-unsigned int vitorias;
-manilha *cartas;
-jogador *prox, *ant;
-}
+typedef struct perfil{
+    char nome[15];
+    unsigned int wins;
+}Perfil;
+
+typedef struct ciclo{
+    //adicionar um bool para inverter a ordem
+    Perfil *perfil;
+    manilha *ant, *prox;
+}Ciclo;
 
 //
 typedef struct baralho {
