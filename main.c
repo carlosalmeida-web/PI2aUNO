@@ -14,6 +14,18 @@ int main()
     system("pause");
     printf("\nprox\n");
     listarManilha(p1);
+    /*
+    printf("Cartas: \n");
+    listarBaralho(cartas);
+    Baralho* mesa = criarMesa();
+    printf("Mesa: \n");
+    listarBaralho(mesa);
+    reembaralhar(mesa, cartas);
+    printf("Cartas: \n");
+    listarBaralho(cartas);
+    printf("Mesa: \n");
+    listarBaralho(mesa);
+    */
 
     return 0;
 }

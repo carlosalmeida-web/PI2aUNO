@@ -67,7 +67,7 @@ typedef struct perfil{
 typedef struct ciclo{
     //adicionar um bool para inverter a ordem
     Perfil *perfil;
-    manilha *ant, *prox;
+    Manilha *ant, *prox;
 }Ciclo;
 
 //
@@ -121,7 +121,7 @@ Carta pegarCarta(Baralho *baralho) {
 
 void listarBaralho(Baralho *cartas){
     
-    for(int i = 0; i < cartas->topo; i++)
+    for(int i = 0; i <= cartas->topo; i++)
         printf("Número: %d, Categoria: %c\n", cartas->carta[i].numero, cartas->carta[i].categoria);
     
 }
@@ -238,7 +238,49 @@ Baralho* criar_baralho() {
     return baralho_principal;
 }
 
+void reembaralhar(Baralho *baralho, Baralho *mesa){
+    Carta topo_mesa = pegarCarta(mesa);
+    int tamanho_vetor = mesa->topo + 1;
+    Carta vetor[tamanho_vetor];
+    int i = 0;
+    while(!baralhoVazio(mesa)){
+        vetor[i] = pegarCarta(mesa);
+        i++;
+    }
+    Carta temp;
+    for(int i = 0, j = (tamanho_vetor-1); i <= j; i++, j--){
+        int random_num = rand() % (tamanho_vetor-1);
+        temp.categoria = vetor[i].categoria;
+        temp.numero = vetor[i].numero;
+        vetor[i].categoria = vetor[random_num].categoria;
+        vetor[i].numero = vetor[random_num].numero;
+        vetor[random_num].categoria = temp.categoria;
+        vetor[random_num].numero = temp.numero;
 
+        random_num = rand() % (tamanho_vetor-1);
+        temp.categoria = vetor[j].categoria;
+        temp.numero = vetor[j].numero;
+        vetor[j].categoria = vetor[random_num].categoria;
+        vetor[j].numero = vetor[random_num].numero;
+        vetor[random_num].categoria = temp.categoria;
+        vetor[random_num].numero = temp.numero;
+    }
+    for(int i = 0; i < tamanho_vetor; i++){
+        adicionarCarta(baralho, vetor[i]);
+    }
+    adicionarCarta(mesa, topo_mesa);
+}
+
+Baralho *criarMesa(){
+    Baralho *mesa = (Baralho*)malloc(sizeof(Baralho));
+    if(mesa == NULL){
+        printf("Erro: ao alocar memória para a mesa!\n");
+        return NULL;
+    }else{
+        mesa->topo = -1;
+    }
+    return mesa;
+}
 
 /*void embaralhar(baralho *cartas)
 {
