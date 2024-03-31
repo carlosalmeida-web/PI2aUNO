@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
+# define getName(var, str)  sprintf(str, "%s", #var) 
 
 #include "Uno.h"
+//#define getName(var, str)  sprintf(str, "%s", #var)
 
 //#define BARALHO_SIZE 108
 
@@ -54,10 +57,12 @@ static const char * const tipoCarta[] = {
 
 typedef struct manilha
 {
+    
     unsigned int *qtd;
     Carta carta;
     struct manilha *ant, *prox;
-} Manilha;
+
+}Manilha;
 
 typedef struct perfil{
     char nome[15];
@@ -65,24 +70,39 @@ typedef struct perfil{
 }Perfil;
 
 typedef struct ciclo{
-    //adicionar um bool para inverter a ordem
+    
     Perfil *perfil;
-    Manilha *ant, *prox;
-}Ciclo;
+    Manilha *mAtual;
+    struct ciclo *ant, *prox;
 
-//
+}Ciclo;
+//Descritor de Ciclo
+typedef struct jogo{
+    
+    int qtdJogadas;
+    int qtdJogadores;
+    bool isInverso;
+    Ciclo *cAtual;
+
+}Jogo;
+
 typedef struct baralho {
     Carta carta[BARALHO_SIZE];
     int topo;
 } Baralho;
 
 // Função para inicializar o baralho
-void inicializarBaralho(Baralho *baralho) {
-    if(baralho->topo != 0 || baralho->carta != NULL){
-        printf("Erro: erro ao inicializar o baralho (Obs.: baralho já possui dados ou foi inicializado)");
-        return;
-    }
-    baralho->topo = -1; // Define o topo como -1 para indicar que o baralho está vazio
+Baralho *criarBaralho(){
+    Baralho *mesa = (Baralho*)malloc(sizeof(Baralho));
+
+    if(mesa == NULL){
+        printf("Erro: falha ao alocar memória para o baralho!\n");
+        return NULL;
+    }    
+    
+    mesa->topo = -1;
+
+    return mesa;
 }
 
 // Função para verificar se o baralho está vazio
@@ -107,17 +127,18 @@ void adicionarCarta(Baralho *baralho, Carta carta) {
 
 // Função para remover uma carta do baralho
 Carta pegarCarta(Baralho *baralho) {
-    Carta cartaVazia = {-1, ""}; // Carta vazia para indicar erro
+
     if (baralhoVazio(baralho)) {
         printf("Erro: o baralho está vazio\n");
+        Carta cartaVazia = {-1, ""}; // Carta vazia para indicar erro
         return cartaVazia; // Retorna uma carta vazia indicando erro
-    } else {
-        Carta carta = baralho->carta[baralho->topo]; // Obtém a carta do topo
-        baralho->topo--; // Decrementa o topo
-        return carta; // Retorna a carta removida
     }
+
+    Carta carta = baralho->carta[baralho->topo]; // Obtém a carta do topo
+    baralho->topo--; // Decrementa o topo
+    return carta; // Retorna a carta removida
+    
 }
-//
 
 void listarBaralho(Baralho *cartas){
     
@@ -146,7 +167,41 @@ Manilha *inicializarManilha() {
     return manilha;
 }
 
-void distribuir_baralho(Baralho *baralho, Manilha **manilha, int quant) {
+Jogo *criarJogo(Ciclo *ciclo){
+    Jogo *jogo = (Jogo*)malloc(sizeof(jogo));
+        if(jogo == NULL){ 
+            printf("Erro: falha ao alocar memória para o Descritor Jogo.\n");
+            return NULL;
+        }
+
+        jogo->qtdJogadas = 0;
+        jogo->qtdJogadores = 0;
+        jogo->cAtual = ciclo;
+        jogo->isInverso = false;
+    
+    return jogo;
+}
+
+void proximoCiclo(Jogo *jogo){
+    if(jogo == NULL || jogo->cAtual == NULL){
+        printf("Erro: jogo ou ciclo atual são inválidos!");
+        return;
+    }
+    if(jogo->isInverso == false){
+    jogo->cAtual = jogo->cAtual->prox;
+    printf("mem: %p\n",jogo->cAtual);
+    }else{
+    jogo->cAtual = jogo->cAtual->ant;
+    printf("mem: %p\n",jogo->cAtual);
+    }
+
+}
+
+bool isPlayer(Jogo *jogo){
+    return jogo->cAtual->perfil->nome != NULL;
+}
+
+void distribuirBaralho(Baralho *baralho, Manilha **manilha, int quant) {
     if (baralhoVazio(baralho)) {
 
         printf("\nErro: Baralho Vazio, não foi possível transferir %d Cartas para a manilha\n", quant);
@@ -182,7 +237,65 @@ void distribuir_baralho(Baralho *baralho, Manilha **manilha, int quant) {
     }
 }
 
-void embaralhar_matriz(char matrix[2][BARALHO_SIZE]) {
+void listarCiclo(Ciclo *ciclo){
+    Ciclo *tempCiclo = ciclo;
+    if(ciclo == NULL) return;
+    do{
+        printf("Memoria: %p\n", *ciclo);
+
+        ciclo = ciclo->prox;
+    }while (ciclo != NULL && ciclo != tempCiclo);
+}
+
+void adicionarCiclo(Jogo *jogo, Manilha *manilha, bool _isPlayer) {
+    if (jogo == NULL || manilha == NULL) {
+        printf("Erro: Jogo ou Manilha não inicializados!\n");
+        return;
+    }
+
+    if (jogo->cAtual == NULL) {
+        printf("Erro: Ciclo não inicializado, falha ao adicionar Manilha ao Ciclo de jogo!\n");
+        return;
+    }
+
+    Ciclo *novoNo = (Ciclo *)malloc(sizeof(Ciclo));
+    if (novoNo == NULL) {
+        printf("Erro: Falha ao alocar memória para novoNo em adicionar Ciclo!\n");
+        return;
+    }
+
+    if(_isPlayer) {
+        novoNo->perfil = malloc(strlen("player") + 1);
+        strcpy(novoNo->perfil->nome, "player"); 
+        }else{
+        novoNo->perfil = malloc(strlen("\0"));
+        novoNo->perfil = '\0';
+    }
+    novoNo->mAtual = manilha;
+    novoNo->ant = jogo->cAtual->ant;
+    novoNo->prox = jogo->cAtual;
+
+    jogo->cAtual->ant->prox = novoNo;
+    jogo->cAtual->ant = novoNo;
+
+    jogo->qtdJogadores++;
+}
+
+Ciclo *criarCiclo(){
+    Ciclo *ciclo = (Ciclo *)malloc(sizeof(Ciclo));
+    if(ciclo == NULL){
+        printf("Erro: Falha ao alocar memoria para o ciclo de jogo!\n");
+        return NULL;
+    } 
+
+    ciclo->prox = ciclo;
+    ciclo->ant = ciclo;
+    ciclo->perfil = NULL;
+
+    return ciclo;
+}
+
+void embaralharMatriz(char matrix[2][BARALHO_SIZE]) {
     srand(time(NULL));
 
     for (int i = BARALHO_SIZE-1; i > 0; i--) {
@@ -199,7 +312,7 @@ void embaralhar_matriz(char matrix[2][BARALHO_SIZE]) {
 
 }
 
-Baralho* criar_baralho() {
+Baralho* gerarBaralho() {
     FILE *file;
     file = fopen("baralho.txt", "r");
     if (file == NULL) {
@@ -220,7 +333,7 @@ Baralho* criar_baralho() {
 
     fclose(file);
 
-    embaralhar_matriz(tempCartas);
+    embaralharMatriz(tempCartas);
 
     Baralho* baralho_principal = (Baralho*)malloc(sizeof(Baralho));
     if (baralho_principal == NULL) {
@@ -250,36 +363,32 @@ void reembaralhar(Baralho *baralho, Baralho *mesa){
     Carta temp;
     for(int i = 0, j = (tamanho_vetor-1); i <= j; i++, j--){
         int random_num = rand() % (tamanho_vetor-1);
+        
         temp.categoria = vetor[i].categoria;
         temp.numero = vetor[i].numero;
+
         vetor[i].categoria = vetor[random_num].categoria;
         vetor[i].numero = vetor[random_num].numero;
+        
         vetor[random_num].categoria = temp.categoria;
         vetor[random_num].numero = temp.numero;
 
         random_num = rand() % (tamanho_vetor-1);
+        
         temp.categoria = vetor[j].categoria;
         temp.numero = vetor[j].numero;
+        
         vetor[j].categoria = vetor[random_num].categoria;
         vetor[j].numero = vetor[random_num].numero;
+        
         vetor[random_num].categoria = temp.categoria;
         vetor[random_num].numero = temp.numero;
+    
     }
     for(int i = 0; i < tamanho_vetor; i++){
         adicionarCarta(baralho, vetor[i]);
     }
     adicionarCarta(mesa, topo_mesa);
-}
-
-Baralho *criarMesa(){
-    Baralho *mesa = (Baralho*)malloc(sizeof(Baralho));
-    if(mesa == NULL){
-        printf("Erro: ao alocar memória para a mesa!\n");
-        return NULL;
-    }else{
-        mesa->topo = -1;
-    }
-    return mesa;
 }
 
 /*void embaralhar(baralho *cartas)

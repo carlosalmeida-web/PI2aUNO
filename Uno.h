@@ -6,20 +6,27 @@
 typedef struct manilha Manilha;
 typedef struct baralho Baralho;
 typedef struct carta Carta;
+typedef struct ciclo Ciclo;
+typedef struct perfil Perfil;
+typedef struct jogo Jogo;
 
-Baralho *criar_baralho();
+Ciclo *criarCiclo();
+Jogo *criarJogo(Ciclo *ciclo);
+Baralho *gerarBaralho();
 void inicializarBaralho(Baralho *baralho);
+void adicionarCiclo(Jogo *jogo, Manilha *manilha, bool _isPlayer);
 int baralhoVazio(Baralho *baralho);
 int baralhoCheio(Baralho *baralho);
+void proximoCiclo(Jogo *jogo);
 void adicionarCarta(Baralho *baralho, Carta carta);
 Carta pegarCarta(Baralho *baralho);
 void listarBaralho(Baralho *cartas);
 void listarManilha(Manilha *cartas);
 Manilha *inicializarManilha();
-void distribuir_baralho(Baralho *baralho, Manilha **manilha, int quant);
+void distribuirBaralho(Baralho *baralho, Manilha **manilha, int quant);
 void reembaralhar(Baralho *baralho, Baralho *mesa);
-Baralho *criarMesa();
-void embaralhar_matriz(char matrix[2][BARALHO_SIZE]);
+Baralho *criarBaralho();
+void embaralharMatriz(char matrix[2][BARALHO_SIZE]);
 
 
 #endif // UNO_H
