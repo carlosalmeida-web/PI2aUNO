@@ -9,7 +9,7 @@ int main()
     int botQuant = 3;
     int cartasInicial = 15;
     
-    Manilha* ganhador = NULL;
+    Manilha* ganhador = NULL;// Botar no descritor jogo
     Ciclo* ciclo = criarCiclo();
     Jogo* jogo = criarJogo(ciclo);
     Baralho* cartas = gerarBaralho();
