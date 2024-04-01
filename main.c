@@ -20,7 +20,7 @@ int main()
     Manilha* bot[botQuant]; 
     
     
-    for(; botQuant-1 > 0; botQuant--){
+    for(; botQuant-1 >= 0; botQuant--){
         
         printf("2");
         bot[botQuant] = inicializarManilha();
