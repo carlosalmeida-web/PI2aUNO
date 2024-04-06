@@ -391,6 +391,24 @@ void reembaralhar(Baralho *baralho, Baralho *mesa){
     adicionarCarta(mesa, topo_mesa);
 }
 
+// vetor de cartas jogaveis
+int **CartasJogaveis(Carta *topo, Manilha *cartas){
+    Manilha *atual = cartas;
+    int ** jogaveis;
+    int num_jogaveis=0;
+    do{
+        if(topo->categoria  == atual->carta.categoria|| atual->carta.numero == topo->numero || atual->carta.categoria == "J"){
+            num_jogaveis++;
+            jogaveis = realloc(jogaveis, sizeof(int *) * num_jogaveis);
+            jogaveis[num_jogaveis - 1] = atual;
+    }
+
+    atual=atual->prox;
+  } while (atual != cartas);
+  return jogaveis;   
+}
+
+
 /*void embaralhar(baralho *cartas)
 {
 
