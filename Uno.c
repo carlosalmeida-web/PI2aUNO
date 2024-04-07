@@ -82,6 +82,7 @@ typedef struct jogo{
     int qtdJogadas;
     int qtdJogadores;
     bool isInverso;
+    Baralho *bMesa;
     Ciclo *cAtual;
 
 }Jogo;
@@ -168,12 +169,12 @@ Manilha *inicializarManilha() {
 }
 
 Jogo *criarJogo(Ciclo *ciclo){
-    Jogo *jogo = (Jogo*)malloc(sizeof(jogo));
+        Jogo *jogo = (Jogo*)malloc(sizeof(Jogo));
         if(jogo == NULL){ 
             printf("Erro: falha ao alocar memória para o Descritor Jogo.\n");
             return NULL;
         }
-
+        jogo->bMesa = (Baralho *)malloc(sizeof(Baralho));
         jogo->qtdJogadas = 0;
         jogo->qtdJogadores = 0;
         jogo->cAtual = ciclo;
@@ -313,27 +314,40 @@ void embaralharMatriz(char matrix[2][BARALHO_SIZE]) {
 }
 
 Baralho* gerarBaralho() {
-    FILE *file;
-    file = fopen("baralho.txt", "r");
-    if (file == NULL) {
+    printf("teste\n");
+    FILE *arquivo;
+    arquivo = fopen("baralho.txt", "r");
+    if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo\n");
         return NULL;
     }
+    printf("teste\n");
 
-    char tempCartas[2][BARALHO_SIZE];
-    char carta[10];
-    int i = 0;
-    while (fgets(carta, 10, file) != NULL) {
-        char *token = strtok(carta, "-");
-        tempCartas[0][i] = token[0];
-        token = strtok(NULL, "-");
-        tempCartas[1][i] = atoi(token);
-        i++;
+    char cartas[2][BARALHO_SIZE];
+    char linha[10];  
+    int contador = 0;    
+    printf("teste\n");
+    
+
+    arquivo = fopen("baralho.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro Crítico: falha ao abrir o arquivo.");
+        exit(1);
     }
 
-    fclose(file);
+    // Ler as cartas do arquivo e armazenar na matriz
+    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+    if (sscanf(linha, "%c - %d", &cartas[0][contador], &cartas[1][contador]) == 2) {
+        printf("Carta lida: %c - %d\n", cartas[0][contador], cartas[1][contador]);
+        contador++;
+    }
+    }
 
-    embaralharMatriz(tempCartas);
+    printf("teste\n");
+
+    fclose(arquivo);
+
+    embaralharMatriz(cartas);
 
     Baralho* baralho_principal = (Baralho*)malloc(sizeof(Baralho));
     if (baralho_principal == NULL) {
@@ -344,9 +358,17 @@ Baralho* gerarBaralho() {
     baralho_principal->topo = -1;
     for (int i = 0; i < BARALHO_SIZE; i++) {
         baralho_principal->topo++;
-        baralho_principal->carta[baralho_principal->topo].categoria = tempCartas[0][i];
-        baralho_principal->carta[baralho_principal->topo].numero = tempCartas[1][i];
+        baralho_principal->carta[baralho_principal->topo].categoria = cartas[0][i];
+        baralho_principal->carta[baralho_principal->topo].numero = cartas[1][i];
     }
+    
+    for (int i = 0; i <= baralho_principal->topo; i++) {
+        printf("Carta %d:\n", i + 1);
+        printf("Categoria: %c\n", baralho_principal->carta[i].categoria);
+        printf("Número: %d\n\n", baralho_principal->carta[i].numero);
+    }
+
+    system("pause");
 
     return baralho_principal;
 }
@@ -391,8 +413,67 @@ void reembaralhar(Baralho *baralho, Baralho *mesa){
     adicionarCarta(mesa, topo_mesa);
 }
 
+Carta *topoBaralho(Baralho *baralho) {
+  if (baralho == NULL) {
+    printf("Erro: baralho não inicializado\n");
+    Carta cartaVazia = {-1,""};
+    exit(1);
+  }
+  return &(baralho->carta[baralho->topo]);
+}
+
+bool jogadaValida(Carta *pCarta, Carta *mCarta) {
+    if(pCarta == NULL){
+        perror("Erro: pCarta não inicializada!\n");
+    }
+    if(mCarta == NULL){
+        perror("Erro: mCarta não inicializada!\n");
+    }
+    printf("jogadaValida\n");
+  if (pCarta->categoria == mCarta->categoria || 
+      pCarta->categoria == 'J' ||
+      pCarta->numero == mCarta->numero){
+              printf("jogadaValida saiuda\n");
+
+    return true;
+      }
+        printf("jogadaValida saiuda\n");
+
+  return false;
+}
+
+bool selecionarCarta(char tecla, Jogo *jogo) {
+  switch (tecla) {
+  case 'A':
+    jogo->cAtual->mAtual = jogo->cAtual->mAtual->ant;
+    return false;
+    break;
+  case 'D':
+    jogo->cAtual->mAtual = jogo->cAtual->mAtual->prox;
+    return false;
+    break;
+  case 'W':
+    /*if (jogadaValida(&(jogo->cAtual->mAtual->carta),
+                     &(jogo->bMesa->carta[jogo->bMesa->topo]))) {
+      Manilha *mTemp = jogo->cAtual->mAtual;
+      jogo->cAtual->ant->prox = mTemp->prox;
+      // terminar lógica
+      adicionarCarta(jogo->bMesa, jogo->cAtual->mAtual->carta);
+      return true;
+    }*/
+    printf("Jogada Inválida");
+    return false;
+
+    break;
+  case 'S':
+
+    break;
+  }
+  return false;
+}
+
 // vetor de cartas jogaveis
-int **CartasJogaveis(Carta *topo, Manilha *cartas){
+/*int **CartasJogaveis(Carta *topo, Manilha *cartas){
     Manilha *atual = cartas;
     int ** jogaveis;
     int num_jogaveis=0;
@@ -406,41 +487,52 @@ int **CartasJogaveis(Carta *topo, Manilha *cartas){
     atual=atual->prox;
   } while (atual != cartas);
   return jogaveis;   
+}*/
+
+void **cartasJogaveis(Carta *topo, Manilha *atual){
+    void **ptrs = malloc(sizeof(void *));
+    if (!ptrs) {
+        perror("Erro ao alocar memória\n");
+        exit(1);
+    }
+  
+    int *quant = malloc(sizeof(int));
+    if (!quant) {
+        perror("Erro ao alocar memória\n");
+        exit(1);
+    }
+
+    *quant = 0;
+    Manilha *tempMani = atual;
+
+    do{
+
+        if(atual == NULL){
+            perror("Erro: manilha não alocada!\n");
+            exit(1);
+        }
+
+      if(jogadaValida(&(atual->carta), topo)){
+
+        (*quant)++;
+        ptrs = realloc(ptrs, sizeof(void *) * ((*quant)+1));
+        ptrs[*quant] = atual;
+
+      }
+
+      atual = atual->prox;
+    }while(atual != tempMani);
+    ptrs[0] = quant;
+
+    return ptrs;
 }
 
-
-/*void embaralhar(baralho *cartas)
-{
-
-    int num_cartas = 0;
-    baralho *carta_atual = cartas;
-    while (carta_atual != NULL)
-    {
-        num_cartas++;
-        carta_atual = carta_atual->prox;
+void printCarta(Manilha *manilha) {
+    if(manilha == NULL) {
+        perror("Erro: Carta vazia!\n");
+        return;
     }
+    printf("Carta:\ncategoria: %c\n", manilha->carta.categoria);
+    printf("numero: %d\n\n", manilha->carta.numero);
 
-
-    for (int i = num_cartas - 1; i > 0; i--)
-    {
-        int j = rand() % (i + 1);
-
-        baralho *carta_i = cartas;
-        for (int k = 0; k < i; k++)
-        {
-            carta_i = carta_i->prox;
-        }
-        baralho *carta_j = cartas;
-        for (int k = 0; k < j; k++)
-        {
-            carta_j = carta_j->prox;
-        }
-
-        int temp_numero = carta_i->numero;
-        char temp_categoria = carta_i->categoria;
-        carta_i->numero = carta_j->numero;
-        carta_i->categoria = carta_j->categoria;
-        carta_j->numero = temp_numero;
-        carta_j->categoria = temp_categoria;
-    }
-}*/
+}

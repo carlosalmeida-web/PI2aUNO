@@ -27,6 +27,13 @@ void distribuirBaralho(Baralho *baralho, Manilha **manilha, int quant);
 void reembaralhar(Baralho *baralho, Baralho *mesa);
 Baralho *criarBaralho();
 void embaralharMatriz(char matrix[2][BARALHO_SIZE]);
+void **cartasJogaveis(Carta *topo, Manilha *atual);
+Carta *topoBaralho(Baralho *baralho);
+bool jogadaValida(Carta *pCarta, Carta *mCarta);
+bool selecionarCarta(char tecla, Jogo *jogo);
+bool isPlayer(Jogo *jogo);
+void printCarta(Manilha *manilha);
+
 
 
 #endif // UNO_H

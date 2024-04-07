@@ -8,29 +8,48 @@ int main()
 {
     int botQuant = 3;
     int cartasInicial = 15;
-    
-    Manilha* ganhador = NULL;// Botar no descritor jogo
+    Manilha *ganhador = NULL;
+
     Ciclo* ciclo = criarCiclo();
     Jogo* jogo = criarJogo(ciclo);
+    printf("2");
+    
     Baralho* cartas = gerarBaralho();
+    
     Manilha* player = inicializarManilha();
+    printf("2");
+
     adicionarCiclo(jogo, player, true);
     distribuirBaralho(cartas, &player, cartasInicial);
+    printf("2");
 
     Manilha* bot[botQuant]; 
     
     
-    for(; botQuant-1 >= 0; botQuant--){
+    for(; botQuant-1 > 0; botQuant--){
         
         printf("2");
         bot[botQuant] = inicializarManilha();
         printf("1");
-        distribuirBaralho(cartas, &(bot[botQuant]), cartasInicial);
+        //distribuirBaralho(cartas, &(bot[botQuant]), cartasInicial);
         adicionarCiclo(jogo, bot[botQuant], false);
         
     }
     do{
-        printf("do\n");
+        
+        /* Exemplo
+        void **ptrs = cartasJogaveis(topoBaralho(cartas), player);
+
+        int *brabo = (int *)ptrs[0];
+        Manilha *rato = (Manilha *)ptrs[1];
+        Manilha *segundo = (Manilha *)ptrs[2];
+        Manilha *terceiro = (Manilha *)ptrs[3];
+
+        printf("brabo: %d", *brabo);
+        printCarta(rato);
+        printCarta(segundo);
+        printCarta(terceiro);
+        */
 
         if(isPlayer(jogo)){
             printf("Certo :D\n");
@@ -60,7 +79,7 @@ int main()
     listarBaralho(cartas);
     printf("Mesa: \n");
     listarBaralho(mesa);
-*/
+*/  printf("reste\n");
 
     return 0;
 }
