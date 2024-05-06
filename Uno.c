@@ -261,13 +261,13 @@ void adicionarNoMalinha(Manilha *manilha, Carta *carta) {
     if(!manilha || !carta)
     {
         perror("Erro: Manilha não alocada!");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     NoManilha *noManilha = (NoManilha*)malloc(sizeof(NoManilha));
     if(!noManilha)
     {
         perror("Erro: Falha ao alocar no Manilha!");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     noManilha->carta = *carta;
@@ -360,7 +360,7 @@ bool isPlayer(Jogo *jogo){
     printf("eero");
     if(jogo->cicloJogadores){
         perror("Erro Crítico: jogador não encontrado!\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     if(jogo->cicloJogadores->jAtual->perfil == NULL|| jogo->cicloJogadores->jAtual->isBot == NULL){
@@ -382,12 +382,12 @@ void distribuirBaralho(Baralho *baralho, Manilha *manilha, int quant) {
 }
 
 Manilha *getManilha(Jogo *jogo) {
-    if(jogo->jogadorAtual->mAtual == NULL){
+    if(jogo->cicloJogadores->jAtual == NULL){
         perror("Erro Crítico: Falha ao encontrar o jogador atual!\n");
         exit(EXIT_FAILURE);
     }
 
-    return jogo->jogadorAtual->mAtual;
+    return jogo->cicloJogadores->jAtual->manilha;
 }
 
 Carta *enviarManilha(Manilha *manilha, Baralho *baralho){
@@ -398,9 +398,9 @@ Carta *enviarManilha(Manilha *manilha, Baralho *baralho){
         exit(EXIT_FAILURE);
     }
 
-                        printf("man!\n");
+        printf("man!\n");
 
-        Carta *carta = &(manilha->carta);
+        Carta *carta = &(manilha->mAtual);
         printf("car: %c\n",carta->categoria);
 
         printf("man!\n");
@@ -412,8 +412,8 @@ Carta *enviarManilha(Manilha *manilha, Baralho *baralho){
         printf("man!\n");
         adicionarCarta(baralho, *carta);
         printf("man!\n");
-        manilha->ant->prox = manilha->prox->ant;
-        manilha->prox->ant = manilha->ant->prox;
+        manilha->mAtual->ant->prox = manilha->mAtual->prox->ant;
+        manilha->mAtual->prox->ant = manilha->mAtual->ant->prox;
                         printf("man!\n");
 
         free(manilha);
@@ -423,7 +423,7 @@ Carta *enviarManilha(Manilha *manilha, Baralho *baralho){
 }
 
 char maiorQtdCor(Jogo *jogo){
-    Manilha *manilha = jogo->jogadorAtual->mAtual;
+    Manilha *manilha = jogo->cicloJogadores->jAtual->manilha;
     int numCor[4];
     int maiorQtd;
     int maiorCor;
@@ -431,11 +431,11 @@ char maiorQtdCor(Jogo *jogo){
     memset(numCor, 0, sizeof(numCor));
     
     do{
-        char *ptr = strchr("RGBY", jogo->jogadorAtual->mAtual->carta.categoria);
-        int valor = ptr ? ptr - jogo->jogadorAtual->mAtual->carta.categoria : -1;
+        char *ptr = strchr("RGBY", jogo->cicloJogadores->jAtual->manilha->mAtual->carta.categoria);
+        int valor = ptr ? ptr - jogo->cicloJogadores->jAtual->manilha->mAtual->carta.categoria : -1;
         numCor[valor]++;
-        manilha = manilha->prox;
-    }while(manilha != jogo->jogadorAtual->mAtual);
+        manilha = manilha->mAtual->prox;
+    }while(manilha != jogo->cicloJogadores->jAtual->manilha);
     
     for(int i = 0;i<4;i++){
         if(numCor[i] > maiorQtd){
@@ -487,11 +487,11 @@ int poderCarta(Carta *carta, Jogo *jogo){
         break;
     case 11:
     printf("poder!\n");
-        jogo->isInverso = !!jogo->isInverso;
+        jogo->cicloJogadores->isInverso = !!jogo->cicloJogadores->isInverso;
         break;
     case 12:
     printf("poder!\n");
-        jogo->jogadorAtual = jogo->jogadorAtual->prox;
+        jogo->cicloJogadores->jAtual->prox = jogo->cicloJogadores->jAtual->prox;
         break;
     case 13:
     printf("poder!\n");
@@ -530,12 +530,12 @@ int poderCarta(Carta *carta, Jogo *jogo){
 }
 
 void listarNoJogador(Jogo *jogo){
-    NoJogador *tempNoJogador = jogo->jogadorAtual;
-    if(jogo->jogadorAtual == NULL) return;
+    NoJogador *tempNoJogador = jogo->cicloJogadores->jAtual;
+    if(jogo->cicloJogadores == NULL) return;
     do{
-        printf("Memoria: %p\n", *jogo->jogadorAtual);
-        jogo->jogadorAtual = jogo->jogadorAtual->prox;
-    }while (jogo->jogadorAtual != NULL && jogo->jogadorAtual != tempNoJogador);
+        printf("Memoria: %p\n", *jogo->cicloJogadores->jAtual);
+        jogo->cicloJogadores->jAtual = jogo->cicloJogadores->jAtual->prox;
+    }while (jogo->cicloJogadores->jAtual != NULL && jogo->cicloJogadores->jAtual != tempNoJogador);
 }
 
 void adicionarNoJogador(Jogo *jogo, Manilha *manilha, bool _isPlayer) {
@@ -544,7 +544,7 @@ void adicionarNoJogador(Jogo *jogo, Manilha *manilha, bool _isPlayer) {
         return;
     }
 
-    if (jogo->jogadorAtual == NULL) {
+    if (jogo->cicloJogadores->jAtual == NULL) {
         printf("Erro: NoJogador não inicializado, falha ao adicionar Manilha ao NoJogador de jogo!\n");
         return;
     }
@@ -555,33 +555,33 @@ void adicionarNoJogador(Jogo *jogo, Manilha *manilha, bool _isPlayer) {
         return;
     }
 
-    novoNo->mAtual = manilha;
+    novoNo->manilha = manilha;
 
-    if (jogo->jogadorAtual->prox == NULL){
+    if (jogo->cicloJogadores->jAtual->prox == NULL){
             
             novoNo->ant = novoNo;
             novoNo->prox = novoNo;
-            jogo->jogadorAtual = novoNo;
+            jogo->cicloJogadores->jAtual = novoNo;
 
         } else {
 
-            novoNo->ant = jogo->jogadorAtual->ant;
-            novoNo->prox = jogo->jogadorAtual;
+            novoNo->ant = jogo->cicloJogadores->jAtual->ant;
+            novoNo->prox = jogo->cicloJogadores->jAtual;
 
-            jogo->jogadorAtual->ant->prox = novoNo;
-            jogo->jogadorAtual->ant = novoNo;
+            jogo->cicloJogadores->jAtual->ant->prox = novoNo;
+            jogo->cicloJogadores->jAtual->ant = novoNo;
 
         }
         
         novoNo->perfil = malloc(sizeof(Perfil));
     if(!_isPlayer) {
-        novoNo->perfil->isBot = true;
+        novoNo->isBot = true;
     }else{
-        novoNo->perfil->isBot = false;
+        novoNo->isBot = false;
     }
     
 
-    jogo->qtdJogadores++;
+    jogo->cicloJogadores->qtdJogadores++;
 }
 
 NoJogador *criarNoJogador(){
@@ -634,7 +634,7 @@ Baralho* gerarBaralho() {
     arquivo = fopen("baralho.txt", "r");
     if (arquivo == NULL) {
         printf("Erro Crítico: falha ao abrir o arquivo.");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     // Ler as cartas do arquivo e armazenar na matriz
@@ -719,7 +719,7 @@ Carta *topoBaralho(Baralho *baralho) {
   if (baralho == NULL) {
     printf("Erro: baralho não inicializado\n");
     Carta cartaVazia = {-1,""};
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   return &(baralho->cartas[baralho->topo]);
 }
@@ -747,17 +747,17 @@ bool jogadaValida(Carta *pCarta, Carta *mCarta) {
 bool selecionarCarta(char tecla, Jogo *jogo) {
   switch (tecla) {
   case 'A':
-    jogo->jogadorAtual->mAtual = jogo->jogadorAtual->mAtual->ant;
+    jogo->cicloJogadores->jAtual->manilha->mAtual = jogo->cicloJogadores->jAtual->manilha->mAtual->ant;
     return false;
     break;
   case 'D':
-    jogo->jogadorAtual->mAtual = jogo->jogadorAtual->mAtual->prox;
+    jogo->cicloJogadores->jAtual->manilha->mAtual = jogo->cicloJogadores->jAtual->manilha->mAtual->prox;
     return false;
     break;
   case 'W':
-    if(jogadaValida(&(jogo->jogadorAtual->mAtual->carta),
+    if(jogadaValida(&(jogo->cicloJogadores->jAtual->manilha->mAtual),
                     &(jogo->bMesa->cartas[jogo->bMesa->topo]))) {
-      enviarManilha(jogo->jogadorAtual->mAtual, jogo->bMesa);
+      enviarManilha(jogo->cicloJogadores->jAtual->manilha->mAtual, jogo->bMesa);
       return true;
     }
     printf("Jogada Inválida");
@@ -792,13 +792,13 @@ void **cartasJogaveis(Carta *topo, Manilha *atual){
     void **ptrs = malloc(sizeof(void *));
     if (ptrs == NULL) {
         perror("Erro ao alocar memória\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
   
     int *quant = malloc(sizeof(int));
     if (quant == NULL) {
         perror("Erro ao alocar memória\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     *quant = 0;
@@ -808,10 +808,10 @@ void **cartasJogaveis(Carta *topo, Manilha *atual){
 
         if(atual == NULL){
             perror("Erro: manilha não alocada!\n");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
-      if(jogadaValida(&(atual->carta), topo)){
+      if(jogadaValida(&(atual->mAtual), topo)){
 
         (*quant)++;
         ptrs = realloc(ptrs, sizeof(void *) * ((*quant)+1));
@@ -819,7 +819,7 @@ void **cartasJogaveis(Carta *topo, Manilha *atual){
 
       }
 
-      atual = atual->prox;
+      atual = atual->mAtual->prox;
     }while(atual != tempMani);
     ptrs[0] = quant;
 
