@@ -39,6 +39,6 @@ Carta *topoBaralho(Baralho *baralho);
 bool jogadaValida(Carta *pCarta, Carta *mCarta);
 bool selecionarCarta(char tecla, Jogo *jogo);
 void **cartasJogaveis(Carta *topo, Manilha *atual);
-
+void printCarta(Manilha *manilha);
 
 #endif // UNO_H
