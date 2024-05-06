@@ -4,40 +4,41 @@
 #define BARALHO_SIZE 108
 
 typedef struct manilha Manilha;
+typedef struct noManilha NoManilha;
+typedef struct noJogador NoJogador;
 typedef struct baralho Baralho;
 typedef struct carta Carta;
-typedef struct ciclo Ciclo;
 typedef struct perfil Perfil;
 typedef struct jogo Jogo;
+typedef struct listaJogadorCircular ListaJogadorCircular;
 
-Ciclo *criarCiclo();
-Jogo *criarJogo(Ciclo *ciclo);
-Baralho *gerarBaralho();
-void inicializarBaralho(Baralho *baralho);
-void adicionarCiclo(Jogo *jogo, Manilha *manilha, bool _isPlayer);
 int baralhoVazio(Baralho *baralho);
 int baralhoCheio(Baralho *baralho);
-void proximoCiclo(Jogo *jogo);
 void adicionarCarta(Baralho *baralho, Carta carta);
 Carta pegarCarta(Baralho *baralho);
-void listarCiclo(Jogo *jogo);
 void listarBaralho(Baralho *cartas);
 void listarManilha(Manilha *cartas);
-Manilha *inicializarManilha();
-void distribuirBaralho(Baralho *baralho, Manilha **manilha, int quant);
-void reembaralhar(Baralho *baralho, Baralho *mesa);
-Baralho *criarBaralho();
+Manilha *criarManilha();
+NoManilha *slotOrdemManilha(Manilha *manilha, char cor, bool reservar);
+void adicionarNoMalinha(Manilha *manilha, Carta *carta);
+Jogo *criarJogo(NoJogador *noJogador);
+void proximoNoJogador(Jogo *jogo);
+bool isPlayer(Jogo *jogo);
+void distribuirBaralho(Baralho *baralho, Manilha *manilha, int quant);
+Manilha *getManilha(Jogo *jogo);
+Carta *enviarManilha(Manilha *manilha, Baralho *baralho);
+char maiorQtdCor(Jogo *jogo);
+int poderCarta(Carta *carta, Jogo *jogo);
+void listarNoJogador(Jogo *jogo);
+void adicionarNoJogador(Jogo *jogo, Manilha *manilha, bool _isPlayer);
+NoJogador *criarNoJogador();
 void embaralharMatriz(char matrix[2][BARALHO_SIZE]);
-void **cartasJogaveis(Carta *topo, Manilha *atual);
+Baralho* gerarBaralho();
+void reembaralhar(Baralho *baralho, Baralho *mesa);
 Carta *topoBaralho(Baralho *baralho);
 bool jogadaValida(Carta *pCarta, Carta *mCarta);
 bool selecionarCarta(char tecla, Jogo *jogo);
-bool isPlayer(Jogo *jogo);
-int poderCarta(Carta *carta, Jogo *jogo);
-Carta *enviarManilha(Manilha *manilha, Baralho *baralho);
-void printCarta(Manilha *manilha);
-Manilha *getManilha(Jogo *jogo);
-
+void **cartasJogaveis(Carta *topo, Manilha *atual);
 
 
 #endif // UNO_H

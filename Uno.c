@@ -390,7 +390,7 @@ Manilha *getManilha(Jogo *jogo) {
     return jogo->cicloJogadores->jAtual->manilha;
 }
 
-Carta *enviarManilha(Manilha *manilha, Baralho *baralho){
+Carta *enviarManilha(Manilha *manilha, Baralho *baralho) {
                 printf("man!\n");
 
     if (baralho == NULL || baralhoVazio(baralho)) {
@@ -422,7 +422,7 @@ Carta *enviarManilha(Manilha *manilha, Baralho *baralho){
         return carta;
 }
 
-char maiorQtdCor(Jogo *jogo){
+char maiorQtdCor(Jogo *jogo) {
     Manilha *manilha = jogo->cicloJogadores->jAtual->manilha;
     int numCor[4];
     int maiorQtd;
@@ -447,7 +447,7 @@ char maiorQtdCor(Jogo *jogo){
     return "RGBY"[maiorCor];
 }
 
-int poderCarta(Carta *carta, Jogo *jogo){
+int poderCarta(Carta *carta, Jogo *jogo) {
                 printf("poder!\n");
                 if(carta == NULL){
                     perror("Erro: Carta não alocada!\n");
@@ -584,7 +584,7 @@ void adicionarNoJogador(Jogo *jogo, Manilha *manilha, bool _isPlayer) {
     jogo->cicloJogadores->qtdJogadores++;
 }
 
-NoJogador *criarNoJogador(){
+NoJogador *criarNoJogador() {
     NoJogador *nojogador = (NoJogador *)malloc(sizeof(NoJogador));
     if(nojogador == NULL){
         printf("Erro: Falha ao alocar memoria para o nojogador de jogo!\n");
