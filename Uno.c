@@ -832,7 +832,6 @@ void printCarta(Manilha *manilha) {
         return;
     }
 
-    printf("Carta:\ncategoria: %c\n", manilha->carta.categoria);
-    printf("numero: %d\n\n", manilha->carta.numero);
-
+    printf("Carta:\ncategoria: %c\n", manilha->mAtual->carta.categoria);
+    printf("numero: %d\n\n", manilha->mAtual->carta.numero);
 }
