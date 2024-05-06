@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "Uno.h"
 
@@ -9,6 +10,7 @@ int main()
     int botQuant = 3;
     int cartasInicial = 15;
     Manilha *ganhador = NULL;
+    printf("2");
 
     Ciclo* ciclo = criarCiclo();
     Jogo* jogo = criarJogo(ciclo);
@@ -26,17 +28,18 @@ int main()
     Manilha* bot[botQuant]; 
     
     
-    for(; botQuant-1 > 0; botQuant--){
-        
-        printf("2");
-        bot[botQuant] = inicializarManilha();
-        printf("1");
-        //distribuirBaralho(cartas, &(bot[botQuant]), cartasInicial);
-        adicionarCiclo(jogo, bot[botQuant], false);
-        
+    for (; botQuant > 0; botQuant--) {
+    printf("2");
+    bot[botQuant - 1] = inicializarManilha();
+    printf("1");
+    distribuirBaralho(cartas, &(bot[botQuant - 1]), cartasInicial);
+    adicionarCiclo(jogo, bot[botQuant - 1], false);
     }
+
     do{
-        
+        printf("teste");
+
+        listarCiclo(jogo);
         /* Exemplo
         void **ptrs = cartasJogaveis(topoBaralho(cartas), player);
 
@@ -50,11 +53,33 @@ int main()
         printCarta(segundo);
         printCarta(terceiro);
         */
+        printf("teste");
 
-        if(isPlayer(jogo)){
+        if(isPlayer(jogo) == false){
+                    printf("teste1");
+
+            selecionarCarta(getchar(), jogo);
             printf("Certo :D\n");
-        }else if(!isPlayer(jogo)){
-            printf("SUS\n");
+        }else if(isPlayer(jogo) == true){
+                    printf("teste2");
+
+            void **ptrs = cartasJogaveis(topoBaralho(cartas), player);
+            printf("bot!\n");
+            int *cQtd = (int *)ptrs[0];
+                        printf("bot!\n");
+
+            srand(time(NULL));
+                        printf("bot!\n");
+
+            *cQtd = (rand() % (*cQtd-1))+1;
+                        printf("bot!\n");
+
+
+            Manilha *jogada = (Manilha *)ptrs[*cQtd];
+            Carta *teste = enviarManilha(jogada, cartas);
+            poderCarta(teste, jogo);
+                        printf("bot!\n");
+
         }else{
             printf("Erro: tipo de Player não indentificado!\n");
         }

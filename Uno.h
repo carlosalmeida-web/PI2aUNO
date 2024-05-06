@@ -20,6 +20,7 @@ int baralhoCheio(Baralho *baralho);
 void proximoCiclo(Jogo *jogo);
 void adicionarCarta(Baralho *baralho, Carta carta);
 Carta pegarCarta(Baralho *baralho);
+void listarCiclo(Jogo *jogo);
 void listarBaralho(Baralho *cartas);
 void listarManilha(Manilha *cartas);
 Manilha *inicializarManilha();
@@ -32,7 +33,10 @@ Carta *topoBaralho(Baralho *baralho);
 bool jogadaValida(Carta *pCarta, Carta *mCarta);
 bool selecionarCarta(char tecla, Jogo *jogo);
 bool isPlayer(Jogo *jogo);
+int poderCarta(Carta *carta, Jogo *jogo);
+Carta *enviarManilha(Manilha *manilha, Baralho *baralho);
 void printCarta(Manilha *manilha);
+Manilha *getManilha(Jogo *jogo);
 
 
 
