@@ -3,7 +3,9 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
-# define getName(var, str)  sprintf(str, "%s", #var) 
+#include <conio.h>
+
+#define getName(var, str)  sprintf(str, "%s", #var) 
 
 #include "Uno.h"
 //#define getName(var, str)  sprintf(str, "%s", #var)
@@ -157,7 +159,6 @@ Baralho *criarBaralho(){
         printf("Erro: falha ao alocar memória para o baralho!\n");
         return NULL;
     }    
-    
     mesa->topo = -1;
 
     return mesa;
@@ -188,14 +189,51 @@ Carta pegarCarta(Baralho *baralho) {
 
     if (baralhoVazio(baralho)) {
         printf("Erro: o baralho está vazio\n");
-        Carta cartaVazia = {-1, ""}; // Carta vazia para indicar erro
+        Carta cartaVazia; // Carta vazia para indicar erro
+        cartaVazia.numero = -1;
         return cartaVazia; // Retorna uma carta vazia indicando erro
     }
+    
 
     Carta carta = baralho->cartas[baralho->topo]; // Obtém a carta do topo
+    if (carta.numero == 14 || carta.numero == 13){
+        carta.categoria = 'J';    
+    }
+        
     baralho->topo--; // Decrementa o topo
     return carta; // Retorna a carta removida
     
+}
+
+void checarLista(Jogo *jogo){
+    NoManilha *tempManilha = jogo->cicloJogadores->jAtual->manilha->mAtual;
+    int cont = 0;
+    for(int f = 1; f <= 2; f++){
+    cont = 0;
+            if(f == 1){
+                printf("\nChecar prox");
+                do{
+                    if(cont >= 40)
+                        system("pause");
+                    printf("\n categoria: %c",tempManilha->carta.categoria);
+                    printf("\n numero: %d",tempManilha->carta.numero);
+                    cont++;
+                    tempManilha = tempManilha->prox;
+                }while(tempManilha != jogo->cicloJogadores->jAtual->manilha->mAtual);
+            }else{
+                printf("\nChecar ant");
+                do{
+                    if(cont >= 40)
+                        system("pause");
+                    printf("\n categoria: %c",tempManilha->carta.categoria);
+                    printf("\n numero: %d",tempManilha->carta.numero);
+                    cont++;
+                    tempManilha = tempManilha->ant;
+                }while(tempManilha != jogo->cicloJogadores->jAtual->manilha->mAtual);
+            
+            }
+    }
+        
 }
 
 void listarBaralho(Baralho *cartas){
@@ -211,13 +249,18 @@ void listarManilha(Manilha *cartas) {
     do{
         printf("Número: %s, Categoria: %c\n", tipoCarta[cartas->mAtual->carta.numero], cartas->mAtual->carta.categoria);
         printf("quantidade: %d\n",cartas->qtd);
-        cartas = cartas->mAtual->prox;
+        cartas->mAtual = cartas->mAtual->prox;
     }while (cartas != NULL && cartas != carta);
 }
 
 Manilha *criarManilha() {
     Manilha *manilha = (Manilha*)malloc(sizeof(Manilha));
-    manilha->qtd = (unsigned int*)malloc(sizeof(unsigned int));
+    printf("criarManil");
+        if(!manilha){
+        perror("Erro: falha ao alocar espaço para manilha");
+        exit(EXIT_FAILURE);
+    }
+    manilha->qtd = 0;
     manilha->mAtual = NULL;
 
     manilha->inicioVermelho = NULL;
@@ -226,114 +269,230 @@ Manilha *criarManilha() {
     manilha->inicioAzul = NULL;
     manilha->inicioCuringa = NULL;
 
+
     return manilha;
 }
 
-NoManilha *slotOrdemManilha(Manilha *manilha, char cor, bool reservar) {
+NoManilha *slotOrdemManilha(Manilha *manilha, char cor) {
     switch(cor)
     {
         case 'R':
-            if(reservar && !manilha->inicioVermelho)
-                manilha->inicioVermelho = malloc(sizeof(NoManilha));
+            printf("R");
             return manilha->inicioVermelho;
         case 'G':
-            if(reservar && !manilha->inicioVerde)
-                manilha->inicioVerde = malloc(sizeof(NoManilha));
+            printf("G");
             return manilha->inicioVerde;
         case 'B':
-            if(reservar && !manilha->inicioAzul)
-                manilha->inicioAzul = malloc(sizeof(NoManilha));
+            printf("B");
             return manilha->inicioAzul;
         case 'Y':
-            if(reservar && !manilha->inicioAmarelo)
-                manilha->inicioAmarelo = malloc(sizeof(NoManilha));
+            printf("Y");
             return manilha->inicioAmarelo;
-        case 'C':
-            if(reservar && !manilha->inicioCuringa)
-                manilha->inicioCuringa = malloc(sizeof(NoManilha));
+        case 'J':
+            printf("J");
             return manilha->inicioCuringa;
     }
 }
 
+void adicionarManilhaAtualSlotCor(Manilha *manilha, Carta carta){
+    char cor = carta.categoria;
+    if(cor == 'R'){
+            printf("R");
+            printf(" %p ", manilha->inicioVermelho);
+            manilha->inicioVermelho = manilha->mAtual;
+            printf(" %p ", manilha->inicioVermelho);
+    }else if(cor == 'G'){
+            printf("G");
+            manilha->inicioVerde = manilha->mAtual;
+    }else if(cor == 'B'){
+            printf("B");
+            manilha->inicioAzul = manilha->mAtual;
+    }else if(cor == 'Y'){
+            printf("Y");
+            manilha->inicioAmarelo = manilha->mAtual;
+    }else if(cor == 'J'){
+            printf("J");
+            manilha->inicioCuringa = manilha->mAtual;
+    }
+}
+
+bool slotCorVazio(Manilha *manilha, char cor){
+    printf("1");
+    
+    if(cor == 'R'){
+            printf("R");
+            if(manilha->inicioVermelho == NULL)
+            return true;
+            printf("returnFalse");
+    }else if(cor == 'G'){
+            printf("G");
+            if(manilha->inicioVerde == NULL)
+            return true;
+            printf("returnFalse");
+    }else if(cor == 'B'){
+            printf("B");
+            if(manilha->inicioAzul == NULL)
+            return true;
+            printf("returnFalse");
+    }else if(cor == 'Y'){
+            printf("Y");
+            if(manilha->inicioAmarelo == NULL)
+            return true;
+            printf("returnFalse");
+    }else if(cor == 'J'){
+            printf("J");
+            if(manilha->inicioCuringa == NULL)
+            return true;
+            printf("returnFalse");
+            
+    }
+    return false;
+    
+}
+
 void adicionarNoMalinha(Manilha *manilha, Carta *carta) {
     
-    char cor[5] = "RGBYC";
+    char cor[5] = "RGBYJ";
     if(!manilha || !carta)
     {
         perror("Erro: Manilha não alocada!");
         exit(EXIT_FAILURE);
     }
-    NoManilha *noManilha = (NoManilha*)malloc(sizeof(NoManilha));
+    NoManilha *noManilha = (NoManilha *)malloc(sizeof(NoManilha));
     if(!noManilha)
     {
         perror("Erro: Falha ao alocar no Manilha!");
         exit(EXIT_FAILURE);
     }
-
+    printf("\nestado 1!");
     noManilha->carta = *carta;
+    printf("\nestado 1.5!");
     manilha->qtd++;
-
-    NoManilha *corAtual = slotOrdemManilha(manilha, carta->categoria, true);
-    NoManilha *tempManilha;
-
-    if(!&corAtual->carta)
+    printf("\nestado 1!");
+    NoManilha *corAtual = slotOrdemManilha(manilha, carta->categoria);
+    printf("\nestado 2!");
+    
+    manilha->mAtual = noManilha;
+    manilha->mAtual->prox = manilha->mAtual;
+    manilha->mAtual->ant = manilha->mAtual;
+    if(slotCorVazio(manilha, noManilha->carta.categoria))
     {
-        corAtual->carta = *carta;
+        printf("\nestado 365632634!");
+        adicionarManilhaAtualSlotCor(manilha, *carta);
+        printf("\nestado 4!");
         char *posicao = strchr(cor, carta->categoria);
+        printf("\nestado 5!");
         int indice = posicao - cor;
+        printf("\nestado 6!");
         for(int i = 1;; i++)
         {
-            if(!cor[indice + i])
-            {
-                indice = 0;
-                i = 0;
-            }
-            tempManilha = slotOrdemManilha(manilha, cor[indice + i], false);
-            if(tempManilha)
-            {
-
-                tempManilha->ant->prox = noManilha;
-                noManilha->ant = tempManilha->ant;
-                tempManilha->ant = noManilha;
-                noManilha->prox = tempManilha;
-                continue;
+            printf("\nestado 7!");
+            int newIndex = (indice + i) % sizeof(cor) / sizeof(cor[0]);
+            printf("teste");
+            printf("%c", carta->categoria);
+            if(!slotCorVazio(manilha, cor[newIndex]) || cor[newIndex] == carta->categoria)
+            {  
+                
+                switch(cor[newIndex]){
+                    case 'R':
+                    manilha->inicioVermelho->ant->prox = manilha->mAtual;
+                    manilha->mAtual->ant = manilha->inicioVermelho->ant;
+                    manilha->inicioVermelho->ant = manilha->mAtual;
+                    manilha->mAtual->prox = manilha->inicioVermelho;
+                    goto EXITLOOP;
+                    case 'G':
+                    manilha->inicioVerde->ant->prox = manilha->mAtual;
+                    manilha->mAtual->ant = manilha->inicioVerde->ant;
+                    manilha->inicioVerde->ant = manilha->mAtual;
+                    manilha->mAtual->prox = manilha->inicioVerde;
+                    goto EXITLOOP;
+                    case 'B':
+                    manilha->inicioAzul->ant->prox = manilha->mAtual;
+                    manilha->mAtual->ant = manilha->inicioAzul->ant;
+                    manilha->inicioAzul->ant = manilha->mAtual;
+                    manilha->mAtual->prox = manilha->inicioAzul;
+                    goto EXITLOOP;
+                    case 'Y':
+                    manilha->inicioAmarelo->ant->prox = manilha->mAtual;
+                    manilha->mAtual->ant = manilha->inicioAmarelo->ant;
+                    manilha->inicioAmarelo->ant = manilha->mAtual;
+                    manilha->mAtual->prox = manilha->inicioAmarelo;
+                    goto EXITLOOP;
+                    case 'J':
+                    manilha->inicioCuringa->ant->prox = manilha->mAtual;
+                    manilha->mAtual->ant = manilha->inicioCuringa->ant;
+                    manilha->inicioCuringa->ant = manilha->mAtual;
+                    manilha->mAtual->prox = manilha->inicioCuringa;
+                    goto EXITLOOP;
+                }
 
             }
 
         }
+                    
+    EXITLOOP:
+        
     }
     else
     {
-        tempManilha = corAtual;
+        printf("\nestado 4!");
+        
+        NoManilha *tempManilha = corAtual;
+        printf("\nCategoria: %c\n", corAtual->carta.categoria);
+        printf("Num: %d\n", corAtual->carta.numero);
+        corAtual->carta.categoria;
+        if(carta == NULL){
+            perror("Erro carta é NULL");
+            exit(EXIT_FAILURE);
+        }
+            
         for(;;){
             tempManilha = tempManilha->prox;
-            if(
-            tempManilha->carta.categoria != carta->categoria || 
-            tempManilha->carta.numero > carta->numero ||
-            tempManilha == corAtual 
-            )
-            {
-            
-                tempManilha->ant->prox = noManilha;
-                noManilha->ant = tempManilha->ant;
-                tempManilha->ant = noManilha;
-                noManilha->prox = tempManilha;
-                continue;
+            printf("\n1Categoria: %c\n", noManilha->carta.categoria);
+            printf("Num: %d\n", noManilha->carta.numero);
 
+            printf("\n2Categoria: %c\n", tempManilha->carta.categoria);
+            printf("Num: %d\n", tempManilha->carta.numero);
+            if( noManilha->carta.categoria != tempManilha->carta.categoria ||
+                noManilha->carta.numero > tempManilha->carta.numero ||
+                tempManilha == corAtual)
+            {
+                    tempManilha->ant->prox = noManilha;
+                    noManilha->ant = tempManilha->ant;
+                    tempManilha->ant = noManilha;
+                    noManilha->prox = tempManilha;
+                    break;
             }
-    }
+        }
     }
 }
 
-Jogo *criarJogo(NoJogador *noJogador){
+Baralho *getBaralhoCompra(Jogo *jogo){
+    return jogo->bCompra;
+}
+
+Baralho *getBaralhoMesa(Jogo *jogo){
+    return jogo->bMesa;
+}
+
+Jogo *criarJogo(){
         Jogo *jogo = (Jogo*)malloc(sizeof(Jogo));
+        
         if(jogo == NULL){ 
-            printf("Erro: falha ao alocar memória para o Descritor Jogo.\n");
+            printf("Erro: falha ao alocar memória para Jogo.\n");
             return NULL;
         }
-        jogo->bMesa = (Baralho *)malloc(sizeof(Baralho));
-        jogo->bCompra = (Baralho *)malloc(sizeof(Baralho));
-        jogo->cicloJogadores->jAtual = noJogador;
+        jogo->bCompra = gerarBaralho();
+        jogo->bMesa = criarBaralho();
+        jogo->cicloJogadores = criarCiclo();
+
+        Carta carta = pegarCarta(jogo->bCompra);
+        if(carta.categoria >= 13){
+            srand(time(NULL));
+            carta.categoria == "RGBY"[rand() % 4];
+        }
+        adicionarCarta(jogo->bMesa, carta);
+        
     
     return jogo;
 }
@@ -343,6 +502,7 @@ void proximoNoJogador(Jogo *jogo){
         printf("Erro: jogo ou nojogador atual são inválidos!");
         return;
     }
+
     if(jogo->cicloJogadores->isInverso == false){
     printf("mem1: %p\n",jogo->cicloJogadores->jAtual);
     printf("mem2: %p\n",jogo->cicloJogadores->jAtual->manilha);
@@ -350,35 +510,49 @@ void proximoNoJogador(Jogo *jogo){
     printf("mem1: %p\n",jogo->cicloJogadores->jAtual);
     printf("mem2: %p\n",jogo->cicloJogadores->jAtual->manilha);
     }else{
+    printf("mem1: %p\n",jogo->cicloJogadores->jAtual);
+    printf("mem2: %p\n",jogo->cicloJogadores->jAtual->manilha);
     jogo->cicloJogadores->jAtual = jogo->cicloJogadores->jAtual->ant;
-    printf("mem: %p\n",jogo->cicloJogadores);
+    printf("mem1: %p\n",jogo->cicloJogadores->jAtual);
+    printf("mem2: %p\n",jogo->cicloJogadores->jAtual->manilha);
     }
 
 }
 
 bool isPlayer(Jogo *jogo){
     printf("eero");
-    if(jogo->cicloJogadores){
+    if(!jogo->cicloJogadores->jAtual){
         perror("Erro Crítico: jogador não encontrado!\n");
         exit(EXIT_FAILURE);
     }
 
-    if(jogo->cicloJogadores->jAtual->perfil == NULL|| jogo->cicloJogadores->jAtual->isBot == NULL){
+    if(!jogo->cicloJogadores->jAtual->perfil){
         perror("Erro: perfil do jogador não encontrado");
-        return true;
+        exit(EXIT_FAILURE);
     }
     printf("eero");
     return jogo->cicloJogadores->jAtual->isBot;
 }
 
-void distribuirBaralho(Baralho *baralho, Manilha *manilha, int quant) {
-    
+void distribuirBaralho(Baralho *baralho, NoJogador *noJogador, int quant) {
+    printf("\n1");
     for (;quant > 0; quant--) {
-
+        printf("\n2");
         Carta carta = pegarCarta(baralho);
 
-        adicionarNoMalinha(manilha, &carta);
+        if(&carta == NULL){
+            perror("Erro: Carta do Baralho é NULL");
+            exit(EXIT_FAILURE);
+        }
+        printf("\n3");
+        adicionarNoMalinha(noJogador->manilha, &carta);
+        printf("\n4");
     }
+}
+
+Carta *getCartaMesa(Jogo *jogo){
+    if(!baralhoVazio(jogo->bMesa))
+    return &(jogo->bMesa->cartas[jogo->bMesa->topo]);
 }
 
 Manilha *getManilha(Jogo *jogo) {
@@ -390,61 +564,86 @@ Manilha *getManilha(Jogo *jogo) {
     return jogo->cicloJogadores->jAtual->manilha;
 }
 
-Carta *enviarManilha(Manilha *manilha, Baralho *baralho) {
-                printf("man!\n");
+bool manilhaVazia(Jogo *jogo){
+    return jogo->cicloJogadores->jAtual->manilha->qtd == 0;
+}
 
+Carta pegarCartaManilha(Manilha *manilha){
+    printf("pegarCartaManilha Entrada");
+    if (manilha->qtd == 0) {
+        // Se a lista estiver vazia, retorne uma carta inválida
+        Carta carta_vazia;
+        carta_vazia.numero = -1;
+        return carta_vazia;
+    }
+
+    Carta carta = manilha->mAtual->carta;
+    NoManilha *tempManilha = manilha->mAtual;
+
+    // Se só houver um nó na lista, resete a manilha
+    if (manilha->qtd == 1) {
+        free(tempManilha);
+        manilha->mAtual = NULL;
+    } else {
+        // Atualize os ponteiros da manilha
+        tempManilha->ant->prox = tempManilha->prox;
+        tempManilha->prox->ant = tempManilha->ant;
+        manilha->mAtual = tempManilha->prox;
+        free(tempManilha);
+    }
+
+    manilha->qtd--;
+    printf("pegarCartaManilha Saida");
+    return carta;
+}
+
+Carta *enviarManilha(Manilha *manilha, Baralho *baralho) {
     if (baralho == NULL || baralhoVazio(baralho)) {
         perror("Erro Crítico: Baralho Vazio, não foi possível transferir %d Cartas para a manilha\n");
         exit(EXIT_FAILURE);
     }
 
-        printf("man!\n");
+        Carta carta = pegarCartaManilha(manilha);
 
-        Carta *carta = &(manilha->mAtual);
-        printf("car: %c\n",carta->categoria);
-
-        printf("man!\n");
-        manilha->qtd--;
-        if(baralho->topo == BARALHO_SIZE-1) {
-            perror("Erro: baralho cheio!\n");
+        if(&carta == NULL){
+            perror("Erro: Carta é NULL");
             exit(EXIT_FAILURE);
         }
-        printf("man!\n");
-        adicionarCarta(baralho, *carta);
-        printf("man!\n");
-        manilha->mAtual->ant->prox = manilha->mAtual->prox->ant;
-        manilha->mAtual->prox->ant = manilha->mAtual->ant->prox;
-                        printf("man!\n");
-
-        free(manilha);
-                printf("car: %c\n",carta->categoria);
-
-        return carta;
+        adicionarCarta(baralho, carta);
+        return &baralho->cartas[baralho->topo];
 }
 
 char maiorQtdCor(Jogo *jogo) {
     Manilha *manilha = jogo->cicloJogadores->jAtual->manilha;
-    int numCor[4];
-    int maiorQtd;
-    int maiorCor;
-     
-    memset(numCor, 0, sizeof(numCor));
+    int numCor[4] = {0}; // Inicializa com 0
+    int maiorQtd = -1; // Inicializa com um valor menor que qualquer possível em numCor
+    int maiorCor = 0;
+    char cor[4] = "RGBY";
     
-    do{
-        char *ptr = strchr("RGBY", jogo->cicloJogadores->jAtual->manilha->mAtual->carta.categoria);
-        int valor = ptr ? ptr - jogo->cicloJogadores->jAtual->manilha->mAtual->carta.categoria : -1;
-        numCor[valor]++;
-        manilha = manilha->mAtual->prox;
-    }while(manilha != jogo->cicloJogadores->jAtual->manilha);
-    
-    for(int i = 0;i<4;i++){
-        if(numCor[i] > maiorQtd){
+    do {
+        if (manilha->mAtual->carta.categoria == 'J') {
+            manilha->mAtual = manilha->mAtual->prox;
+            continue;
+        }
+        
+        char *posicao = strchr(cor, manilha->mAtual->carta.categoria);
+        if (posicao != NULL) {
+            int valor = posicao - cor;
+            numCor[valor]++;
+        }
+
+        manilha->mAtual = manilha->mAtual->prox;
+    } while (manilha->mAtual != jogo->cicloJogadores->jAtual->manilha->mAtual);
+
+    for (int i = 0; i < 4; i++) {
+        if (numCor[i] > maiorQtd) {
             maiorQtd = numCor[i];
             maiorCor = i;
-        } 
+        }
     }
 
-    return "RGBY"[maiorCor];
+    printf("maior: %c\n", cor[maiorCor]);
+    return cor[maiorCor];
 }
 
 int poderCarta(Carta *carta, Jogo *jogo) {
@@ -484,118 +683,121 @@ int poderCarta(Carta *carta, Jogo *jogo) {
     case 10:
     printf("poder!\n");
         return 2;
-        break;
     case 11:
     printf("poder!\n");
         jogo->cicloJogadores->isInverso = !!jogo->cicloJogadores->isInverso;
         break;
     case 12:
     printf("poder!\n");
-        jogo->cicloJogadores->jAtual->prox = jogo->cicloJogadores->jAtual->prox;
+        jogo->cicloJogadores->jAtual = jogo->cicloJogadores->jAtual->prox;
         break;
     case 13:
     printf("poder!\n");
-    bool prox = false;
-    char cor;
-
-    if(isPlayer(jogo) == false){
-        srand(time(NULL));
-        if(rand() % 6 >= 4){ //40% de chance de escolher uma cor aléatoria 
-            jogo->bMesa->cartas[jogo->bMesa->topo].categoria = maiorQtdCor(jogo);
-        }else{
-            cor = "RGBY"[rand() % 4];
-        }
-    }
-
-    do{
-        printf("Digite a Primeira letra da cor desejada em inglês, sendo repectivamente:\n R - Vermelho, G - Verde, B - Azul, Y - Amarelo\n");
-        cor = getchar();
-        if(cor == 'R' || cor == 'G' || cor == 'B' || cor == 'Y'){
-            jogo->bMesa->cartas[jogo->bMesa->topo].categoria = cor;
-            prox = true;
-        }else{
-            system("clear");
-            printf("Entrada Inválida\n Escolha uma cor válida para continuar!\n");
-            system("pause");
-        }
-    }while(prox);
+            alterarCorCarta(jogo, carta);
         break;
     case 14:
     printf("poder!\n");
-        return 4;
-        break;
+            alterarCorCarta(jogo, carta);
+            return 4;
     }
     printf("poder, foi!\n");
     return 0;
 }
 
-void listarNoJogador(Jogo *jogo){
-    NoJogador *tempNoJogador = jogo->cicloJogadores->jAtual;
-    if(jogo->cicloJogadores == NULL) return;
-    do{
-        printf("Memoria: %p\n", *jogo->cicloJogadores->jAtual);
-        jogo->cicloJogadores->jAtual = jogo->cicloJogadores->jAtual->prox;
-    }while (jogo->cicloJogadores->jAtual != NULL && jogo->cicloJogadores->jAtual != tempNoJogador);
+void alterarCorCarta(Jogo *jogo, Carta *carta){
+    bool prox = false;
+    char cor;
+    system("cls");
+    if(isPlayer(jogo) == false){
+        srand(time(NULL));
+        if((rand() % 10) <= 3){ //40% de chance de escolher uma cor aléatoria 
+            printf("\nranddaw");
+            jogo->bMesa->cartas[jogo->bMesa->topo].categoria = maiorQtdCor(jogo);
+            printf("\nranddaw2");
+        }else{
+            printf("rataria");
+            cor = "RGBY"[rand() % 4];
+            carta->categoria = cor;
+        }
+    }
+    else do{
+        
+        printf("Digite a Primeira letra da cor desejada em inglês, sendo repectivamente:\n R - Vermelho, G - Verde, B - Azul, Y - Amarelo\n");
+        cor = _getch();
+        if(cor == 'R' || cor == 'G' || cor == 'B' || cor == 'Y'){
+            carta->categoria = cor;
+            prox = true;
+        }else{
+            system("cls");
+            printf("Entrada Inválida\n Escolha uma cor válida para continuar!\n");
+        }
+    }while(!prox);
 }
 
-void adicionarNoJogador(Jogo *jogo, Manilha *manilha, bool _isPlayer) {
-    if (jogo == NULL || manilha == NULL) {
-        printf("Erro: Jogo ou Manilha não inicializados!\n");
-        return;
-    }
-
-    if (jogo->cicloJogadores->jAtual == NULL) {
-        printf("Erro: NoJogador não inicializado, falha ao adicionar Manilha ao NoJogador de jogo!\n");
-        return;
-    }
-
-    NoJogador *novoNo = (NoJogador *)malloc(sizeof(NoJogador));
-    if (novoNo == NULL) {
-        printf("Erro: Falha ao alocar memória para novoNo em adicionar NoJogador!\n");
-        return;
-    }
-
-    novoNo->manilha = manilha;
-
-    if (jogo->cicloJogadores->jAtual->prox == NULL){
-            
-            novoNo->ant = novoNo;
-            novoNo->prox = novoNo;
-            jogo->cicloJogadores->jAtual = novoNo;
-
-        } else {
-
-            novoNo->ant = jogo->cicloJogadores->jAtual->ant;
-            novoNo->prox = jogo->cicloJogadores->jAtual;
-
-            jogo->cicloJogadores->jAtual->ant->prox = novoNo;
-            jogo->cicloJogadores->jAtual->ant = novoNo;
-
+void listarNoJogador(Jogo *jogo){
+    if(jogo->cicloJogadores == NULL) return;
+    NoJogador *tempJogador = jogo->cicloJogadores->jAtual;
+    do{
+        if(tempJogador->isBot){
+            printf("\n(Player) ->");
+        }else{
+            printf("(Bot) ->");
         }
-        
-        novoNo->perfil = malloc(sizeof(Perfil));
-    if(!_isPlayer) {
-        novoNo->isBot = true;
-    }else{
-        novoNo->isBot = false;
+        tempJogador = tempJogador->prox;
+    }while (tempJogador != jogo->cicloJogadores->jAtual);
+}
+
+void adicionarNoJogador(Jogo *jogo, NoJogador *noJogador, bool _isPlayer) {
+    if (jogo == NULL || noJogador == NULL) {
+        printf("Erro: Jogo ou noJogador não inicializados!\n");
+        return;
     }
     
+    printf("teste");
+    if (jogo->cicloJogadores->jAtual == NULL){
+        jogo->cicloJogadores->jAtual = noJogador;
+
+    } else {
+            
+        jogo->cicloJogadores->jAtual->ant->prox = noJogador;
+        noJogador->ant = jogo->cicloJogadores->jAtual->ant;         
+        jogo->cicloJogadores->jAtual->ant = noJogador;
+        noJogador->prox = jogo->cicloJogadores->jAtual;
+            
+    }
 
     jogo->cicloJogadores->qtdJogadores++;
 }
 
-NoJogador *criarNoJogador() {
+NoJogador *criarNoJogador(bool _isPlayer) {
     NoJogador *nojogador = (NoJogador *)malloc(sizeof(NoJogador));
+
     if(nojogador == NULL){
-        printf("Erro: Falha ao alocar memoria para o nojogador de jogo!\n");
+        perror("Erro: Falha ao alocar memoria para o nojogador de jogo!\n");
         return NULL;
     } 
 
-    nojogador->prox = NULL;
-    nojogador->ant = NULL;
-    nojogador->perfil = NULL;
+    nojogador->prox = nojogador;
+    nojogador->ant = nojogador;
+    nojogador->perfil = (Perfil *)malloc(sizeof(Perfil));
+    nojogador->isBot = _isPlayer;
+    nojogador->manilha = criarManilha();
 
     return nojogador;
+}
+
+ListaJogadorCircular *criarCiclo(){
+    ListaJogadorCircular *listaJogadorCircular = (ListaJogadorCircular *)malloc(sizeof(ListaJogadorCircular));
+    if(listaJogadorCircular == NULL){
+        perror("Erro: Falha ao alocar memoria para a Lista Jogador de jogo!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    listaJogadorCircular->isInverso = false;
+    listaJogadorCircular->jAtual = NULL;
+    listaJogadorCircular->qtdJogadas = 0;
+    listaJogadorCircular->qtdJogadores = 0;
+    return listaJogadorCircular;
 }
 
 void embaralharMatriz(char matrix[2][BARALHO_SIZE]) {
@@ -670,7 +872,6 @@ Baralho* gerarBaralho() {
         printf("Número: %d\n\n", baralho_principal->cartas[i].numero);
     }
 
-    system("pause");
 
     return baralho_principal;
 }
@@ -718,7 +919,6 @@ void reembaralhar(Baralho *baralho, Baralho *mesa){
 Carta *topoBaralho(Baralho *baralho) {
   if (baralho == NULL) {
     printf("Erro: baralho não inicializado\n");
-    Carta cartaVazia = {-1,""};
     exit(EXIT_FAILURE);
   }
   return &(baralho->cartas[baralho->topo]);
@@ -731,44 +931,165 @@ bool jogadaValida(Carta *pCarta, Carta *mCarta) {
     if(mCarta == NULL){
         perror("Erro: mCarta não inicializada!\n");
     }
-    printf("jogadaValida\n");
+    printf("\nplayer Carta \nCor: %c Núumero: %d\n",pCarta->categoria,pCarta->numero);
+    printf("\nmesa Carta \nCor: %c Núumero: %d\n",mCarta->categoria,mCarta->numero);
   if (pCarta->categoria == mCarta->categoria || 
       pCarta->categoria == 'J' ||
       pCarta->numero == mCarta->numero){
-              printf("jogadaValida saiuda\n");
-
-    return true;
-      }
         printf("jogadaValida saiuda\n");
+        return true;
+    }
+        printf("jogadaInvalida saiuda\n");
 
-  return false;
+    return false;
 }
 
-bool selecionarCarta(char tecla, Jogo *jogo) {
+bool verificarComprarCarta(Jogo *jogo, int compra){
+    
+    system("cls");
+    for(;compra > 0;compra--){
+        Carta cartaComprada = pegarCartaCompra(getBaralhoMesa(jogo), getBaralhoCompra(jogo));
+        adicionarNoMalinha(jogo->cicloJogadores->jAtual->manilha, &cartaComprada);
+        printf("\nCarta Comprada[%d]\n", compra);
+        printCarta(jogo->cicloJogadores->jAtual->manilha);
+    }
+
+    if(comprar4PoderSkip(jogo))
+    return true;
+        
+return false;
+}
+
+int selecionarCarta(char tecla, Jogo *jogo) {
   switch (tecla) {
-  case 'A':
+  case 'A': case 'a':
     jogo->cicloJogadores->jAtual->manilha->mAtual = jogo->cicloJogadores->jAtual->manilha->mAtual->ant;
-    return false;
-    break;
-  case 'D':
+    printf("\n\nMesa: ");
+    printf("Numero: %d ", jogo->bMesa->cartas[jogo->bMesa->topo].numero);
+    printf("Cor: %c \n", jogo->bMesa->cartas[jogo->bMesa->topo].categoria);
+    
+    printf("\nManilha: ");
+    printf("Numero: %d ", jogo->cicloJogadores->jAtual->manilha->mAtual->carta.numero);
+    printf("Cor: %c \n\n", jogo->cicloJogadores->jAtual->manilha->mAtual->carta.categoria);
+    return -1;
+  case 'D': case 'd':
     jogo->cicloJogadores->jAtual->manilha->mAtual = jogo->cicloJogadores->jAtual->manilha->mAtual->prox;
-    return false;
-    break;
-  case 'W':
-    if(jogadaValida(&(jogo->cicloJogadores->jAtual->manilha->mAtual),
-                    &(jogo->bMesa->cartas[jogo->bMesa->topo]))) {
-      enviarManilha(jogo->cicloJogadores->jAtual->manilha->mAtual, jogo->bMesa);
-      return true;
+    printf("\n\nMesa: ");
+    printf("Numero: %d ", jogo->bMesa->cartas[jogo->bMesa->topo].numero);
+    printf("Cor: %c \n", jogo->bMesa->cartas[jogo->bMesa->topo].categoria);
+    
+    printf("\nManilha: ");
+    printf("Numero: %d ", jogo->cicloJogadores->jAtual->manilha->mAtual->carta.numero);
+    printf("Cor: %c \n\n", jogo->cicloJogadores->jAtual->manilha->mAtual->carta.categoria);
+    return -1;
+  case 'W': case 'w':
+    Carta tempCarta = jogo->bMesa->cartas[jogo->bMesa->topo];
+    printf("\n\nMesa: ");
+    printf("Numero: %d ", tempCarta.numero);
+    printf("Cor: %c \n", tempCarta.categoria);
+    
+    printf("\nManilha: ");
+    printf("Numero: %d ", jogo->cicloJogadores->jAtual->manilha->mAtual->carta.numero);
+    printf("Cor: %c \n\n", jogo->cicloJogadores->jAtual->manilha->mAtual->carta.categoria);
+    if(jogadaValida(&(jogo->cicloJogadores->jAtual->manilha->mAtual->carta),
+                    &(jogo->bMesa->cartas[jogo->bMesa->topo]))) 
+    {
+      Carta *carta = enviarManilha(jogo->cicloJogadores->jAtual->manilha, jogo->bMesa);
+      return poderCarta(carta, jogo);
     }
     printf("Jogada Inválida");
-    return false;
+    return -1;
 
     break;
-  case 'S':
+  case 'S': case 's':
+    void **ptrs = cartasJogaveis(topoBaralho(jogo->bMesa), jogo->cicloJogadores->jAtual->manilha);
+    int *cQtd = (int *)ptrs[0];
+    if(*cQtd <= 0){
 
-    break;
+        START:
+        Carta carta = comprarCarta(jogo);
+        if(carta.numero != -1);
+        if(!jogadaValida(&carta, &jogo->bMesa->cartas[jogo->bMesa->topo])){
+            system("cls");
+            printf("CartaJogada não Valida!\n Precione 'S' novamente para comprar outra carta!");
+            fflush(stdin);
+            char comando = _getch();
+            if(comando == 's' || comando == 'S')
+            goto START;
+        }   
+
+    }
+    return -1;
   }
-  return false;
+  return -1;
+}
+
+bool comprar4PoderSkip(Jogo *jogo){
+    if(getCartaMesa(jogo)->numero == 14)
+    {
+        proximoNoJogador(jogo);
+    }
+        return true;
+    return false;
+}
+
+void abastercerBaralho(Baralho *baralhoReceptor, Baralho *baralhoDoador){
+    Carta carta;
+    for(; baralhoDoador->topo > 0;){
+        printf("PEGOU CARTA ABSTERCER!!!!!!!!!!!!!!!!!!!!!");
+        carta = pegarCarta(baralhoDoador);
+        adicionarCarta(baralhoReceptor, carta);
+
+    }
+    printf("saiu");
+}
+
+Carta pegarCartaCompra(Baralho *baralhoMesa, Baralho *baralhoCompra){
+        printf("\npegarCartaCompra");
+        Carta carta = pegarCarta(baralhoCompra);
+
+        if(carta.numero <= -1 && baralhoMesa->topo > 0){
+            abastercerBaralho(baralhoCompra, baralhoMesa);
+            carta = pegarCarta(baralhoCompra);
+        }
+
+        printf("\nNúmero: %d", carta.numero);
+        printf("\nCor %c\n", carta.categoria);
+
+        return carta;
+    
+}
+
+bool comprarCartaBot(Jogo *jogo){
+    for(;;){
+        printf("Sem Carta Necessaria");
+        Carta cartaComprada = comprarCarta(jogo);        
+        if(cartaComprada.numero == -1)
+        {
+            printf("Baralho da Mesa e Baralha compra vazios!\n Passando a vez!");
+            return false;
+        }
+        if(jogadaValida(&cartaComprada, getCartaMesa(jogo))){
+            return true;
+        }
+    }
+}
+
+
+Carta comprarCarta(Jogo *jogo){
+    
+    Manilha *manilha = jogo->cicloJogadores->jAtual->manilha;
+    Baralho *baralhoMesa = jogo->bMesa;
+    Baralho *baralhoCompra = jogo->bCompra;
+    printf("\ncomprarCarta");
+    Carta carta = pegarCartaCompra(baralhoMesa, baralhoCompra);
+    if(carta.numero == -1 || &carta.categoria == NULL){
+        printf("comprarCarta return NULL");
+        exit(EXIT_FAILURE);
+    }
+    adicionarNoMalinha(manilha, &carta);
+
+    return carta;
 }
 
 // vetor de cartas jogaveis
@@ -790,6 +1111,7 @@ bool selecionarCarta(char tecla, Jogo *jogo) {
 
 void **cartasJogaveis(Carta *topo, Manilha *atual){
     void **ptrs = malloc(sizeof(void *));
+    
     if (ptrs == NULL) {
         perror("Erro ao alocar memória\n");
         exit(EXIT_FAILURE);
@@ -801,26 +1123,30 @@ void **cartasJogaveis(Carta *topo, Manilha *atual){
         exit(EXIT_FAILURE);
     }
 
+    if(atual == NULL){
+        perror("Erro: manilha não alocada!\n");
+        exit(EXIT_FAILURE);
+    }
+    
     *quant = 0;
-    Manilha *tempMani = atual;
-
+    NoManilha *tempMani = atual->mAtual;
+    printf("\n\n\nPega Visão\n\n\n\n\n\n\n");
     do{
-
-        if(atual == NULL){
-            perror("Erro: manilha não alocada!\n");
+        if(&atual->mAtual->carta == NULL){
+            perror("Erro: carta NULL");
             exit(EXIT_FAILURE);
         }
 
-      if(jogadaValida(&(atual->mAtual), topo)){
-
+        if(jogadaValida(&(tempMani->carta), topo)){
+            
         (*quant)++;
         ptrs = realloc(ptrs, sizeof(void *) * ((*quant)+1));
         ptrs[*quant] = atual;
 
       }
 
-      atual = atual->mAtual->prox;
-    }while(atual != tempMani);
+      tempMani = tempMani->prox;
+    }while(atual->mAtual != tempMani);
     ptrs[0] = quant;
 
     return ptrs;

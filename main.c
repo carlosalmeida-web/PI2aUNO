@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <conio.h>
 
 #include "Uno.h"
 
@@ -9,37 +10,31 @@ int main()
 {
     int botQuant = 3;
     int cartasInicial = 15;
-    Manilha *ganhador = NULL;
-    printf("2");
-
-    Ciclo* ciclo = criarCiclo();
-    Jogo* jogo = criarJogo(ciclo);
-    printf("2");
+    bool ganhador = false;
+    Jogo* jogo = criarJogo();
     
-    Baralho* cartas = gerarBaralho();
+    Baralho *cartas = getBaralhoCompra(jogo);
     
-    Manilha* player = inicializarManilha();
-    printf("2");
+    NoJogador *player = criarNoJogador(true);
+    adicionarNoJogador(jogo, player, true);
+    distribuirBaralho(cartas, player, cartasInicial);
+    listarManilha(getManilha(jogo));
 
-    adicionarCiclo(jogo, player, true);
-    distribuirBaralho(cartas, &player, cartasInicial);
-    printf("2");
-
-    Manilha* bot[botQuant]; 
+    //NoJogador* bot[botQuant]; 
     
     
     for (; botQuant > 0; botQuant--) {
-    printf("2");
-    bot[botQuant - 1] = inicializarManilha();
-    printf("1");
-    distribuirBaralho(cartas, &(bot[botQuant - 1]), cartasInicial);
-    adicionarCiclo(jogo, bot[botQuant - 1], false);
+    NoJogador* bot = criarNoJogador(false);
+
+    distribuirBaralho(cartas, bot, cartasInicial);
+    adicionarNoJogador(jogo, bot, false);
+    if(isPlayer(jogo))
+        printf("\nisPlayer\n");
     }
 
+    int Compra = 0;
     do{
-        printf("teste");
-
-        listarCiclo(jogo);
+        listarNoJogador(jogo);
         /* Exemplo
         void **ptrs = cartasJogaveis(topoBaralho(cartas), player);
 
@@ -53,39 +48,72 @@ int main()
         printCarta(segundo);
         printCarta(terceiro);
         */
-        printf("teste");
+        printf("\n\ndiferentão\n\n");
+        checarLista(jogo);
+        if(isPlayer(jogo)){
 
-        if(isPlayer(jogo) == false){
-                    printf("teste1");
+            if(Compra > 0 && verificarComprarCarta(jogo, Compra))
+            {
+                Compra = 0;
+                continue;
+            }
+            Compra = 0;
+            
+            char comando = 'n';
+            int exitLoop = -1;
+            do{
+            
+                printf("Escolha sua acao entre:\n a - Esquerda\n d - Direita\n s - Comprar(Se Possivel)\n w - Jogar Carta Destacada(Se Possivel)\n");
+                fflush(stdin);
+                comando = _getch(); 
+                if(comando == 'a' || comando == 's' || comando == 'd' || comando == 'w'){
+                    exitLoop = selecionarCarta(comando, jogo);
+                }
 
-            selecionarCarta(getchar(), jogo);
+            }while(exitLoop == -1);
+            Compra = exitLoop;
+            //selecionarCarta(getchar(), jogo);
             printf("Certo :D\n");
-        }else if(isPlayer(jogo) == true){
-                    printf("teste2");
-
-            void **ptrs = cartasJogaveis(topoBaralho(cartas), player);
-            printf("bot!\n");
-            int *cQtd = (int *)ptrs[0];
-                        printf("bot!\n");
-
-            srand(time(NULL));
-                        printf("bot!\n");
-
-            *cQtd = (rand() % (*cQtd-1))+1;
-                        printf("bot!\n");
-
-
-            Manilha *jogada = (Manilha *)ptrs[*cQtd];
-            Carta *teste = enviarManilha(jogada, cartas);
-            poderCarta(teste, jogo);
-                        printf("bot!\n");
-
+            
         }else{
-            printf("Erro: tipo de Player não indentificado!\n");
-        }
+            if(Compra > 0 && verificarComprarCarta(jogo, Compra))
+            {
+                Compra = 0;
+                continue;
+            }
+            Compra = 0;
+            
+            void **ptrs = cartasJogaveis(topoBaralho(getBaralhoMesa(jogo)), getManilha(jogo));
+            int *cQtd = (int *)ptrs[0];
+            if(*cQtd > 0){
+            srand(time(NULL));
+            printf("\n%d---------------------------------------------------------------------\n", *cQtd);
+            if(*cQtd > 1){
+                *cQtd = (rand() % (*cQtd-1))+1;
+            }else{
+                *cQtd = 1;
+            }
+            
+            Manilha *jogada = (Manilha *)ptrs[*cQtd];
+            Carta *teste = enviarManilha(jogada, getBaralhoMesa(jogo));
+            Compra = poderCarta(teste, jogo);
+            
+            }else{
+                
+                bool skip = comprarCartaBot(jogo);
+                if(skip == false)
+                {
+                Manilha *jogada = getManilha(jogo);
+                Carta *teste = enviarManilha(jogada, getBaralhoMesa(jogo));
+                Compra = poderCarta(teste, jogo);
+                }                
+            }
 
-        proximoCiclo(jogo);
-    }while(ganhador == NULL);
+        }
+        ganhador = manilhaVazia(jogo);
+        proximoNoJogador(jogo);
+        printf("\nProximo Jogador\n"); 
+    }while(!ganhador);
 
 /*
     listarBaralho(cartas);
