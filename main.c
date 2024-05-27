@@ -95,7 +95,7 @@ int main()
             }
             
             Manilha *jogada = (Manilha *)ptrs[*cQtd];
-            Carta *teste = enviarManilha(jogada, getBaralhoMesa(jogo));
+            NoCarta *teste = enviarManilha(jogada, getBaralhoMesa(jogo));
             Compra = poderCarta(teste, jogo);
             
             }else{
@@ -104,7 +104,7 @@ int main()
                 if(skip == false)
                 {
                 Manilha *jogada = getManilha(jogo);
-                Carta *teste = enviarManilha(jogada, getBaralhoMesa(jogo));
+                NoCarta *teste = enviarManilha(jogada, getBaralhoMesa(jogo));
                 Compra = poderCarta(teste, jogo);
                 }                
             }
