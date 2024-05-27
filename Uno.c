@@ -1091,6 +1091,7 @@ void abastercerBaralho(Baralho *baralhoReceptor, Baralho *baralhoDoador){
     NoCarta *carta;
     for(; baralhoDoador->topo > 0;){
         printf("PEGOU CARTA ABSTERCER!!!");
+	    //Usar FIFO
         carta = pegarCarta(baralhoDoador);
         adicionarCarta(baralhoReceptor, carta);
 
