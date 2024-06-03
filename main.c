@@ -34,30 +34,16 @@ int main()
 
     int Compra = 0;
     do{
+        proximoNoJogador(jogo);
         listarNoJogador(jogo);
-        /* Exemplo
-        void **ptrs = cartasJogaveis(topoBaralho(cartas), player);
-
-        int *brabo = (int *)ptrs[0];
-        Manilha *rato = (Manilha *)ptrs[1];
-        Manilha *segundo = (Manilha *)ptrs[2];
-        Manilha *terceiro = (Manilha *)ptrs[3];
-
-        printf("brabo: %d", *brabo);
-        printCarta(rato);
-        printCarta(segundo);
-        printCarta(terceiro);
-        */
-        printf("\n\ndiferentão\n\n");
+        
         checarLista(jogo);
         if(isPlayer(jogo)){
 
-            if(Compra > 0 && verificarComprarCarta(jogo, Compra))
+            if(Compra > 0 && verificarComprarCarta(jogo, &Compra))
             {
-                Compra = 0;
                 continue;
             }
-            Compra = 0;
             
             char comando = 'n';
             int exitLoop = -1;
@@ -76,18 +62,18 @@ int main()
             printf("Certo :D\n");
             
         }else{
-            if(Compra > 0 && verificarComprarCarta(jogo, Compra))
+            if(Compra > 0 && verificarComprarCarta(jogo, &Compra))
             {
-                Compra = 0;
                 continue;
             }
-            Compra = 0;
             
             void **ptrs = cartasJogaveis(topoBaralho(getBaralhoMesa(jogo)), getManilha(jogo));
             int *cQtd = (int *)ptrs[0];
+
             if(*cQtd > 0){
+            
             srand(time(NULL));
-            printf("\n%d---------------------------------------------------------------------\n", *cQtd);
+            
             if(*cQtd > 1){
                 *cQtd = (rand() % (*cQtd-1))+1;
             }else{
@@ -111,28 +97,9 @@ int main()
 
         }
         ganhador = manilhaVazia(jogo);
-        proximoNoJogador(jogo);
         printf("\nProximo Jogador\n"); 
     }while(!ganhador);
-
-/*
-    listarBaralho(cartas);
-    printf("tesrt");
-    system("pause");
-    printf("\nprox\n");
-    listarManilha(p1);
-    
-    printf("Cartas: \n");
-    listarBaralho(cartas);
-    Baralho* mesa = criarBaralho();
-    printf("Mesa: \n");
-    listarBaralho(mesa);
-    reembaralhar(mesa, cartas);
-    printf("Cartas: \n");
-    listarBaralho(cartas);
-    printf("Mesa: \n");
-    listarBaralho(mesa);
-*/  printf("reste\n");
+    printf("reste\n");
 
     return 0;
 }

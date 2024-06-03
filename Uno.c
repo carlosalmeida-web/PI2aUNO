@@ -8,28 +8,6 @@
 #define getName(var, str)  sprintf(str, "%s", #var) 
 
 #include "Uno.h"
-//#define getName(var, str)  sprintf(str, "%s", #var)
-
-//#define BARALHO_SIZE 108
-
-/*NoManilha { Carta *carta, Manilha ListaJogadorCircular;}
-
-Manilha { unsigned int qtd, NoManilha *início, NoManilha *inicioAzul, NoManilha *inicioVermelho, NoManilha *inicioVerde, NoManilha *inicioAmarelo, NoManilha *inicioCoringa }
-
-NoJogador{ char nome[15],  unsigned int wins, Manilha() }
-
-listaJogadorCircular{ int qtdJogadores, int qtdJogadas , NoJogador *inicio, bool isInverso}
-
-Jogo { Baralho *BMesa, Baralho *BCompra, listaJogadorCircular *lista }
-
-distribuirBaralho() -> se adequar às mudanças do código.
-
-reembaralhar() -> resetarBaralho()
-
-resetarBaralho(): Adicionar checagem para carta coringa de troca de cor (vira cor curinga).
-
-NoJogador passa a ser Manilha()
-*/
 
 // Coloque: tipoCarta[carta.numero] para retornar o tipo da carta solicitada.
 
@@ -114,6 +92,7 @@ typedef struct noJogador
     Perfil *perfil;
     bool isBot;
     struct noJogador *ant, *prox;
+    bool isUno;
 
 } NoJogador;
 
@@ -469,12 +448,15 @@ Jogo *criarJogo(){
         jogo->bCompra = gerarBaralho();
         jogo->bMesa = criarBaralho();
         jogo->cicloJogadores = criarCiclo();
+        int cartaInt = jogo->bCompra->topo;
 
+        for(;jogo->bCompra->cartas[cartaInt]->numero > 12; cartaInt--);
+
+        NoCarta *cartaAux = jogo->bCompra->cartas[cartaInt];
+        jogo->bCompra->cartas[cartaInt] = jogo->bCompra->cartas[jogo->bCompra->topo];
+        jogo->bCompra->cartas[jogo->bCompra->topo] = cartaAux;
+        printf("2");
         NoCarta *carta = pegarCarta(jogo->bCompra);
-        if(carta->categoria >= 13){
-            srand(time(NULL));
-            carta->categoria == "RGBY"[rand() % 4];
-        }
         adicionarCarta(jogo->bMesa, carta);
         
     
@@ -831,6 +813,7 @@ NoJogador *criarNoJogador(bool _isPlayer) {
     nojogador->perfil = (Perfil *)malloc(sizeof(Perfil));
     nojogador->isBot = _isPlayer;
     nojogador->manilha = criarManilha();
+    nojogador->isUno = false;
 
     return nojogador;
 }
@@ -998,20 +981,153 @@ bool jogadaValida(NoCarta *pCarta, NoCarta *mCarta) {
     return false;
 }
 
-bool verificarComprarCarta(Jogo *jogo, int compra){
+void playerUnoThread(NoJogador *noJogador){
+    do{
+        char comando = '\0';
+        bool playerVerificado = false;
+        NoJogador *auxNoJogador = noJogador;
+        do{
+            comando = _getch();
+        }while(comando == ' ');
+        do{
+            if(noJogador->isBot == false){
+                if(auxNoJogador->manilha->qtd == 1 && noJogador->isUno == true){
+                    noJogador->isUno = false;
+                    break;
+                }
+                playerVerificado = true;
+                noJogador = auxNoJogador;
+            }
+            if(noJogador->isBot == true && playerVerificado == true && noJogador->manilha->qtd == 1 && noJogador->isUno == true){
+                printf("\n!UNO!\n Você gritou UNO!\nE um bot teve que comprar uma carta!\n");
+            }
+            auxNoJogador = auxNoJogador->prox;
+        }while(auxNoJogador != noJogador);
+    }while(false != true);
+}
+
+void unoThread(NoJogador *noJogador, Jogo *jogo){
+    noJogador->isUno == true;
     
-    system("cls");
-    for(;compra > 0;compra--){
+    srand(time(NULL));
+    
+    _sleep((rand() % 4) + 2);
+    
+    if(noJogador->manilha->qtd != 1) {
+        noJogador->isUno = false;
+        return;
+    }
+    
+    if(noJogador->isBot == true && rand() % 10 < 7 && noJogador->manilha->qtd == 1){
+    
+        printf("\n!UNO!\n Bot gritou UNO!\nE ele está com uma carta!\n");
+        noJogador->isUno == false;
+        system("pause");
+        return;
+    }
+
+    if(noJogador->isUno == true && noJogador->manilha->qtd == 1){
+        
+        system("cls");
+        if(noJogador->isBot == false){
+            printf("\n!UNO!\n Bot gritou UNO!\nvocê teve que comprar uma carta!\n");
+        }else{
+            printf("\n!UNO!\n Bot gritou UNO!\nE um bot teve que comprar uma carta!\n");
+        }
+
         NoCarta *cartaComprada = pegarCartaCompra(getBaralhoMesa(jogo), getBaralhoCompra(jogo));
         adicionarNoMalinha(jogo->cicloJogadores->jAtual->manilha, cartaComprada);
-        printf("\nCarta Comprada[%d]\n", compra);
+        printf("\nCarta Uno Comprada\n");
+        printCarta(jogo->cicloJogadores->jAtual->manilha);
+
+        noJogador->isUno = false;
+        system("pause");
+        return;
+    }
+
+}
+
+NoCarta *contarComprarMais2(NoCarta *noCarta) {
+    if (noCarta == NULL) return NULL;
+
+    NoCarta *tempNoCarta = NULL;
+    int count = 0;
+    NoCarta *auxNoCarta = noCarta;
+
+    do {
+        if (auxNoCarta->numero == 10) {
+            count++;
+            NoCarta *newTemp = realloc(tempNoCarta, sizeof(NoCarta) * count);
+            if (newTemp == NULL) {
+                free(tempNoCarta); // Libera memória em caso de falha
+                return NULL;
+            }
+            tempNoCarta = newTemp;
+            tempNoCarta[count + 1] = *auxNoCarta;
+        }
+        auxNoCarta = auxNoCarta->prox;
+    } while (auxNoCarta != noCarta);
+
+    return tempNoCarta;
+}
+
+
+// Função para verificar se há cartas disponíveis
+bool verificarComprarCarta(Jogo *jogo, int *compra) {
+    system("cls");
+
+    if (jogo->bMesa->cartas[jogo->bMesa->topo]->numero == 10) {
+        printf("Compra Sendo realizada!");
+        system("pause");
+        NoCarta *cartas = contarComprarMais2(jogo->cicloJogadores->jAtual->manilha->mAtual);
+        printf("2");
+        system("pause");
+        if (cartas != NULL) {
+            char comando;
+            do {
+                printf("\nContinuar a corrente de +2 ? (S/N)\n");
+                fflush(stdin);
+                comando = _getch();
+            } while (comando != 'S' && comando != 'N');
+
+            if (comando == 'S') {
+                int count = 0;
+                do {
+                    system("cls");
+                    printf("\nQual carta você deseja Lançar? (A - Esquerda, D - Direita, W - Jogar Carta)\n");
+                    printf("\nMão \n Categoria: %c Tipo: %d\n", cartas[count].categoria, cartas[count].numero);
+                    printf("\nMesa \n Categoria: %c Tipo: %d\n", jogo->bMesa->cartas[jogo->bMesa->topo]->categoria, jogo->bMesa->cartas[jogo->bMesa->topo]->numero);
+
+                    comando = _getch();
+                    if (comando == 'a' && count > 0) {
+                        count--;
+                    } else if (comando == 'd' && count < (sizeof(cartas)/sizeof(NoCarta))) { // Verifica se há próxima carta
+                        count++;
+                    }
+                } while (comando != 'w' && comando != 'W');
+
+                adicionarCarta(jogo->bMesa, &cartas[count]);
+                (*compra) += 2;
+                free(cartas); // Libera memória alocada
+                return false;
+            }
+            free(cartas); // Libera memória alocada
+        }
+    }
+
+    for (; *compra > 0; (*compra)--) {
+        NoCarta *cartaComprada = pegarCartaCompra(getBaralhoMesa(jogo), getBaralhoCompra(jogo));
+        adicionarNoMalinha(jogo->cicloJogadores->jAtual->manilha, cartaComprada);
+        printf("\nCarta Comprada[%d]\n", *compra);
         printCarta(jogo->cicloJogadores->jAtual->manilha);
     }
 
-    if(comprar4PoderSkip(jogo))
-    return true;
-        
-return false;
+
+
+    if (jogo->bMesa->cartas[jogo->bMesa->topo]->categoria == 14) {
+        return true;
+    }
+    return false;
 }
 
 int selecionarCarta(char tecla, Jogo *jogo) {
@@ -1078,21 +1194,18 @@ int selecionarCarta(char tecla, Jogo *jogo) {
   return -1;
 }
 
-bool comprar4PoderSkip(Jogo *jogo){
-    if(getCartaMesa(jogo)->numero == 14)
-    {
-        proximoNoJogador(jogo);
-    }
-        return true;
-    return false;
-}
-
 void abastercerBaralho(Baralho *baralhoReceptor, Baralho *baralhoDoador){
-    NoCarta *carta;
+    NoCarta *cartaAux;
+
+    cartaAux = baralhoDoador->cartas[baralhoDoador->topo];
+    baralhoDoador->cartas[baralhoDoador->topo] = baralhoDoador->cartas[0];
+    baralhoDoador->cartas[0] = cartaAux;
+
     for(; baralhoDoador->topo > 0;){
+
         printf("PEGOU CARTA ABSTERCER!!!");
-        carta = pegarCarta(baralhoDoador);
-        adicionarCarta(baralhoReceptor, carta);
+        cartaAux = pegarCarta(baralhoDoador);
+        adicionarCarta(baralhoReceptor, cartaAux);
 
     }
     printf("saiu");
@@ -1102,13 +1215,10 @@ NoCarta *pegarCartaCompra(Baralho *baralhoMesa, Baralho *baralhoCompra){
         printf("\npegarCartaCompra");
         NoCarta *carta = pegarCarta(baralhoCompra);
 
-        if(carta->numero <= -1 && baralhoMesa->topo > 0){
+        if(carta == NULL && baralhoMesa->topo > 0){
             abastercerBaralho(baralhoCompra, baralhoMesa);
             carta = pegarCarta(baralhoCompra);
         }
-
-        printf("\nNúmero: %d", carta->numero);
-        printf("\nCor %c\n", carta->categoria);
 
         return carta;
     
@@ -1145,23 +1255,6 @@ NoCarta *comprarCarta(Jogo *jogo){
 
     return carta;
 }
-
-// vetor de cartas jogaveis
-/*int **CartasJogaveis(Carta *topo, Manilha *cartas){
-    Manilha *atual = cartas;
-    int ** jogaveis;
-    int num_jogaveis=0;
-    do{
-        if(topo->categoria  == atual->carta.categoria|| atual->carta.numero == topo->numero || atual->carta.categoria == "J"){
-            num_jogaveis++;
-            jogaveis = realloc(jogaveis, sizeof(int *) * num_jogaveis);
-            jogaveis[num_jogaveis - 1] = atual;
-    }
-
-    atual=atual->prox;
-  } while (atual != cartas);
-  return jogaveis;   
-}*/
 
 void **cartasJogaveis(NoCarta *topo, Manilha *atual){
     void **ptrs = malloc(sizeof(void *));

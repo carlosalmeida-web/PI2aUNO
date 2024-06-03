@@ -12,9 +12,8 @@ typedef struct perfil Perfil;
 typedef struct jogo Jogo;
 typedef struct listaJogadorCircular ListaJogadorCircular;
 
-bool comprar4PoderSkip(Jogo *jogo);
 void checarLista(Jogo *jogo);
-bool verificarComprarCarta(Jogo *jogo, int compra);
+bool verificarComprarCarta(Jogo *jogo, int *compra);
 NoCarta *pegarCartaCompra(Baralho *baralhoMesa, Baralho *baralhoCompra);
 Baralho *getBaralhoMesa(Jogo *jogo);
 bool comprarCartaBot(Jogo *jogo);
