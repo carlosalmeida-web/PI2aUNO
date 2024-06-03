@@ -646,7 +646,7 @@ NoCarta *enviarManilha(Manilha *manilha, Baralho *baralho) {
 
 char maiorQtdCor(Jogo *jogo) {
     Manilha *manilha = jogo->cicloJogadores->jAtual->manilha;
-    int numCor[4] = {0}; // Inicializa com 0
+    int numCor[4] = {0,0,0,0}; // Inicializa com 0
     int maiorQtd = -1; // Inicializa com um valor menor que qualquer possível em numCor
     int maiorCor = 0;
     char cor[4] = "RGBY";
