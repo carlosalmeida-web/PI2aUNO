@@ -3,11 +3,14 @@
 #include <stdbool.h>
 #include <time.h>
 #include <conio.h>
+#include <windows.h>
 
+#include "pthread.h"
 #include "Uno.h"
 
 int main()
 {
+
     int botQuant = 3;
     int cartasInicial = 15;
     bool ganhador = false;
@@ -32,7 +35,14 @@ int main()
         printf("\nisPlayer\n");
     }
 
+    
     int Compra = 0;
+    
+    pthread_t threadPlayer;
+    pthread_t unoState;
+
+    pthread_create(&threadPlayer, NULL, playerUnoThread, player);
+
     do{
         proximoNoJogador(jogo);
         listarNoJogador(jogo);
@@ -45,14 +55,17 @@ int main()
                 continue;
             }
             
-            char comando = 'n';
+            char comando = '\0';
+            char aceitaveis[8] = {'a','A','s','S','d','D','w','W'};
             int exitLoop = -1;
             do{
-            
                 printf("Escolha sua acao entre:\n a - Esquerda\n d - Direita\n s - Comprar(Se Possivel)\n w - Jogar Carta Destacada(Se Possivel)\n");
-                fflush(stdin);
-                comando = _getch(); 
-                if(comando == 'a' || comando == 's' || comando == 'd' || comando == 'w'){
+                comando = inputsAceitaveis(aceitaveis, sizeof(aceitaveis) / sizeof(aceitaveis[0]), player); 
+                //TODO: substituir por switch
+                if(comando == 'a' || comando == 'A' ||
+                   comando == 's' || comando == 'S' ||
+                   comando == 'd' || comando == 'D' ||
+                   comando == 'w' || comando == 'W'){
                     exitLoop = selecionarCarta(comando, jogo);
                 }
 

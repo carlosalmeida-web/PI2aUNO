@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <conio.h>
+#include <Windows.h>
 
 #define getName(var, str)  sprintf(str, "%s", #var) 
 
@@ -93,6 +94,7 @@ typedef struct noJogador
     bool isBot;
     struct noJogador *ant, *prox;
     bool isUno;
+    char input;
 
 } NoJogador;
 
@@ -183,7 +185,6 @@ void checarLista(Jogo *jogo){
                 printf("\nChecar prox");
                 do{
                     if(cont >= 40)
-                        system("pause");
                     printf("\n categoria: %c",tempManilha->categoria);
                     printf("\n numero: %d",tempManilha->numero);
                     cont++;
@@ -193,7 +194,6 @@ void checarLista(Jogo *jogo){
                 printf("\nChecar ant");
                 do{
                     if(cont >= 40)
-                        system("pause");
                     printf("\n categoria: %c",tempManilha->categoria);
                     printf("\n numero: %d",tempManilha->numero);
                     cont++;
@@ -646,33 +646,36 @@ NoCarta *enviarManilha(Manilha *manilha, Baralho *baralho) {
 
 char maiorQtdCor(Jogo *jogo) {
     Manilha *manilha = jogo->cicloJogadores->jAtual->manilha;
-    int numCor[4] = {0}; // Inicializa com 0
+    int numCor[4] = {0,0,0,0}; // Inicializa com 0
     int maiorQtd = -1; // Inicializa com um valor menor que qualquer possível em numCor
     int maiorCor = 0;
     char cor[4] = "RGBY";
+    printf("entrou 1!");
     
     do {
         if (manilha->mAtual->categoria == 'J') {
             manilha->mAtual = manilha->mAtual->prox;
             continue;
         }
-        
+        printf("entrou %c (1)!\n", manilha->mAtual->categoria);
         char *posicao = strchr(cor, manilha->mAtual->categoria);
         if (posicao != NULL) {
             int valor = posicao - cor;
             numCor[valor]++;
         }
-
+        printf("entrou %c (2)!\n", manilha->mAtual->categoria);
         manilha->mAtual = manilha->mAtual->prox;
     } while (manilha->mAtual != jogo->cicloJogadores->jAtual->manilha->mAtual);
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i <= 3; i++) {
         if (numCor[i] > maiorQtd) {
             maiorQtd = numCor[i];
             maiorCor = i;
+            printf("entrou %c!\n", numCor[i]);
         }
     }
 
+    printf("saiu\n");
     printf("maior: %c\n", cor[maiorCor]);
     return cor[maiorCor];
 }
@@ -754,14 +757,18 @@ void alterarCorCarta(Jogo *jogo, NoCarta *carta){
     else do{
         
         printf("Digite a Primeira letra da cor desejada em inglês, sendo repectivamente:\n R - Vermelho, G - Verde, B - Azul, Y - Amarelo\n");
-        cor = _getch();
-        if(cor == 'R' || cor == 'G' || cor == 'B' || cor == 'Y'){
-            carta->categoria = cor;
+            char comando = '\0';
+            char aceitaveis[8] = {'r','R','g','G','b','B','y','Y'};
+            do{
+                comando = inputsAceitaveis(aceitaveis, sizeof(aceitaveis) / sizeof(aceitaveis[0]), getNoPlayer(jogo->cicloJogadores->jAtual)); 
+                //TODO: substituir por switch
+
+            }while(comando != 'r' && comando != 'R' && 
+                   comando != 'g' && comando != 'G' && 
+                   comando != 'b' && comando != 'B' && 
+                   comando != 'y' && comando != 'Y');
+            carta->categoria = comando;
             prox = true;
-        }else{
-            system("cls");
-            printf("Entrada Inválida\n Escolha uma cor válida para continuar!\n");
-        }
     }while(!prox);
 }
 
@@ -815,7 +822,36 @@ NoJogador *criarNoJogador(bool _isPlayer) {
     nojogador->manilha = criarManilha();
     nojogador->isUno = false;
 
+    if(_isPlayer == true)
+        nojogador->input = '\0';
+    
+
     return nojogador;
+}
+
+char inputsAceitaveis(char *vectorInput, size_t size, NoJogador *noJogador){
+    printf("p: %p", noJogador);
+    do{}while(noJogador->input == '\0' || noJogador->input == ' ');
+    char input = noJogador->input;
+    printf("size: %d\n", size);
+    noJogador->input = '\0';
+
+    for(size_t i = 0; i < size; i++)
+    {
+        printf("i: %d\n",i);
+        if(vectorInput[i] == input)
+        {
+            
+            noJogador->input = '\0';
+            return input;
+            
+        }
+    }
+
+    return '\0';
+    //if(noJogador != ' ')
+    //    noJogador->input = '\0';
+
 }
 
 ListaJogadorCircular *criarCiclo(){
@@ -981,14 +1017,16 @@ bool jogadaValida(NoCarta *pCarta, NoCarta *mCarta) {
     return false;
 }
 
-void playerUnoThread(NoJogador *noJogador){
+void *playerUnoThread(void *jogador){
+    NoJogador *noJogador = (NoJogador *)jogador;
     do{
-        char comando = '\0';
         bool playerVerificado = false;
         NoJogador *auxNoJogador = noJogador;
         do{
-            comando = _getch();
-        }while(comando == ' ');
+            noJogador->input = _getch();
+        }while(noJogador->input != ' ');
+        printf("carlos");
+        noJogador->input = '\0';
         do{
             if(noJogador->isBot == false){
                 if(auxNoJogador->manilha->qtd == 1 && noJogador->isUno == true){
@@ -1004,26 +1042,28 @@ void playerUnoThread(NoJogador *noJogador){
             auxNoJogador = auxNoJogador->prox;
         }while(auxNoJogador != noJogador);
     }while(false != true);
+    return NULL;
 }
 
-void unoThread(NoJogador *noJogador, Jogo *jogo){
+void *unoThread(void *jogador, void *jogoAtual){
+    Jogo *jogo = jogoAtual;
+    NoJogador *noJogador = jogador;
     noJogador->isUno == true;
     
     srand(time(NULL));
-    
-    _sleep((rand() % 4) + 2);
+    int timeRand = (rand() % 4) + 2;
+    Sleep(timeRand);
     
     if(noJogador->manilha->qtd != 1) {
         noJogador->isUno = false;
-        return;
+        return NULL;
     }
     
     if(noJogador->isBot == true && rand() % 10 < 7 && noJogador->manilha->qtd == 1){
     
         printf("\n!UNO!\n Bot gritou UNO!\nE ele está com uma carta!\n");
         noJogador->isUno == false;
-        system("pause");
-        return;
+        return NULL;
     }
 
     if(noJogador->isUno == true && noJogador->manilha->qtd == 1){
@@ -1041,10 +1081,8 @@ void unoThread(NoJogador *noJogador, Jogo *jogo){
         printCarta(jogo->cicloJogadores->jAtual->manilha);
 
         noJogador->isUno = false;
-        system("pause");
-        return;
     }
-
+    return NULL;
 }
 
 NoCarta *contarComprarMais2(NoCarta *noCarta) {
@@ -1054,22 +1092,26 @@ NoCarta *contarComprarMais2(NoCarta *noCarta) {
     int count = 0;
     NoCarta *auxNoCarta = noCarta;
 
+    // Traverse the circular linked list
     do {
         if (auxNoCarta->numero == 10) {
             count++;
-            NoCarta *newTemp = realloc(tempNoCarta, sizeof(NoCarta) * count);
-            if (newTemp == NULL) {
-                free(tempNoCarta); // Libera memória em caso de falha
-                return NULL;
+            NoCarta *newTemp = realloc(tempNoCarta, sizeof(NoCarta*) * count);
+            if (newTemp == NULL) 
+            {
+                free(tempNoCarta); // Free memory in case of failure
+                printf("Erro ao continuar chain de +2");
+                exit(1);
             }
             tempNoCarta = newTemp;
-            tempNoCarta[count + 1] = *auxNoCarta;
+            tempNoCarta[count - 1] = *auxNoCarta; // Store the current card
         }
         auxNoCarta = auxNoCarta->prox;
     } while (auxNoCarta != noCarta);
 
     return tempNoCarta;
-}
+}   
+
 
 
 // Função para verificar se há cartas disponíveis
@@ -1078,17 +1120,16 @@ bool verificarComprarCarta(Jogo *jogo, int *compra) {
 
     if (jogo->bMesa->cartas[jogo->bMesa->topo]->numero == 10) {
         printf("Compra Sendo realizada!");
-        system("pause");
         NoCarta *cartas = contarComprarMais2(jogo->cicloJogadores->jAtual->manilha->mAtual);
         printf("2");
-        system("pause");
         if (cartas != NULL) {
-            char comando;
+            char comando = '\0';
+            char aceitaveis[4] = {'s','S','n','N'};
             do {
+                system("cls");
                 printf("\nContinuar a corrente de +2 ? (S/N)\n");
-                fflush(stdin);
-                comando = _getch();
-            } while (comando != 'S' && comando != 'N');
+                comando = inputsAceitaveis(aceitaveis, sizeof(aceitaveis) / sizeof(aceitaveis[0]), getNoPlayer(jogo->cicloJogadores->jAtual));
+            } while (comando != 's' && comando != 'S' && comando != 'n' && comando != 'N');
 
             if (comando == 'S') {
                 int count = 0;
@@ -1105,8 +1146,8 @@ bool verificarComprarCarta(Jogo *jogo, int *compra) {
                         count++;
                     }
                 } while (comando != 'w' && comando != 'W');
-
-                adicionarCarta(jogo->bMesa, &cartas[count]);
+                
+                adicionarCarta(jogo->bMesa, &(cartas[count-1]));
                 (*compra) += 2;
                 free(cartas); // Libera memória alocada
                 return false;
@@ -1122,12 +1163,20 @@ bool verificarComprarCarta(Jogo *jogo, int *compra) {
         printCarta(jogo->cicloJogadores->jAtual->manilha);
     }
 
-
-
     if (jogo->bMesa->cartas[jogo->bMesa->topo]->categoria == 14) {
         return true;
     }
     return false;
+}
+
+NoJogador *getNoPlayer(NoJogador *noJogador){
+    
+    while(noJogador->isBot == false)
+    {noJogador = noJogador->prox;
+    printf("rataara\n");
+    }
+
+    return noJogador;
 }
 
 int selecionarCarta(char tecla, Jogo *jogo) {
@@ -1182,7 +1231,6 @@ int selecionarCarta(char tecla, Jogo *jogo) {
         if(!jogadaValida(carta, jogo->bMesa->cartas[jogo->bMesa->topo])){
             system("cls");
             printf("CartaJogada não Valida!\n Precione 'S' novamente para comprar outra carta!");
-            fflush(stdin);
             char comando = _getch();
             if(comando == 's' || comando == 'S')
             goto START;
@@ -1204,14 +1252,8 @@ void abastercerBaralho(Baralho *baralhoReceptor, Baralho *baralhoDoador){
     for(; baralhoDoador->topo > 0;){
 
         printf("PEGOU CARTA ABSTERCER!!!");
-<<<<<<< HEAD
         cartaAux = pegarCarta(baralhoDoador);
         adicionarCarta(baralhoReceptor, cartaAux);
-=======
-	    //Usar FIFO
-        carta = pegarCarta(baralhoDoador);
-        adicionarCarta(baralhoReceptor, carta);
->>>>>>> 80249b959355d656bfb412c69355ab0aef3a4f5a
 
     }
     printf("saiu");
