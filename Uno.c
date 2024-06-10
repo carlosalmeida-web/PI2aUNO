@@ -1106,7 +1106,7 @@ bool verificarComprarCarta(Jogo *jogo, int *compra) {
                     }
                 } while (comando != 'w' && comando != 'W');
 
-                adicionarCarta(jogo->bMesa, &cartas[count]);
+                adicionarCarta(jogo->bMesa, &cartas[count - 1]);
                 (*compra) += 2;
                 free(cartas); // Libera memória alocada
                 return false;
