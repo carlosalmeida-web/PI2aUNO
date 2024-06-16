@@ -99,7 +99,12 @@ int main()
         ganhador = manilhaVazia(jogo);
         printf("\nProximo Jogador\n"); 
     }while(!ganhador);
-    printf("reste\n");
+    system("cls");
+    If(isPlayer(jogo)){
+        printf("Parabéns, Você Ganhou!!");
+    }else{
+        printf("Você Perdeu, Tente novamente!!");
+    }
 
     return 0;
 }
