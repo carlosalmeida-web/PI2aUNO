@@ -4,9 +4,71 @@
 
 O projeto visa desenvolver um jogo de cartas chamado UNO para ser jogado em console, seguindo as mesmas regras do jogo original. O desenvolvimento do jogo utilizará listas simplesmente ligadas, listas duplamente ligadas, estruturas e outros conceitos abordados no curso de Estrutura de Dados.
 
-## Requisitos do Projeto
+## Estruturas
+
+### Estrutura: NoCarta:
+Estrutura que representa uma carta do baralho.
+
+- **numero**: Enumeração que representa o número da carta.
+- **categoria**: Caractere que representa a categoria da carta.
+- **ant**: Ponteiro para o nó anterior na lista duplamente encadeada.
+- **prox**: Ponteiro para o próximo nó na lista duplamente encadeada.
+
+### Estrutura: Manilha:
+Estrutura que representa a pilha de cartas de manilha de um jogador.
+
+- **qtd**: Número inteiro que representa a quantidade de cartas na pilha.
+- **mAtual**: Ponteiro para a carta atual de manilha na pilha.
+- **inicioAzul**: Ponteiro para a carta inicial da cor Azul.
+- **inicioVermelho**: Ponteiro para a carta inicial da cor Vermelha.
+- **inicioVerde**: Ponteiro para a carta inicial da cor Verde.
+- **inicioAmarelo**: Ponteiro para a carta inicial da cor Amarela.
+- **inicioCuringa**: Ponteiro para a carta inicial de Curinga.
+
+### Estrutura: Perfil:
+Estrutura que armazena o perfil de um jogador.
+
+- **nome**: Array de caracteres que armazena o nome do jogador.
+- **wins**: Número inteiro que representa o número de vitórias do jogador.
+
+### Estrutura: Settings:
+Estrutura que armazena as configurações do jogo.
+
+- **ordem**: Array de caracteres que representa a ordem das cores das cartas.
+
+### Estrutura: NoJogador:
+Estrutura que representa um jogador no jogo.
+
+- **manilha**: Ponteiro para a pilha de manilha do jogador.
+- **perfil**: Ponteiro para o perfil do jogador.
+- **isBot**: Booleano que indica se o jogador é um bot.
+- **ant**: Ponteiro para o jogador anterior na lista circular de jogadores.
+- **prox**: Ponteiro para o próximo jogador na lista circular de jogadores.
+- **isUno**: Booleano que indica se o jogador disse "Uno".
+
+### Estrutura: ListaJogadorCircular:
+Estrutura que representa a lista circular de jogadores.
+
+- **jAtual**: Ponteiro para o jogador atual na lista.
+- **qtdJogadores**: Número inteiro que representa a quantidade de jogadores na lista.
+- **qtdJogadas**: Número inteiro que representa a quantidade de jogadas realizadas.
+- **isInverso**: Booleano que indica se o sentido da lista está invertido.
+
+### Estrutura: Baralho:
+Estrutura que representa o baralho de cartas.
+
+- **cartas**: Array de ponteiros para as cartas do baralho.
+- **topo**: Índice inteiro que representa o topo do baralho.
+
+### Estrutura: Jogo:
+Estrutura principal que representa o estado do jogo.
+
+- **bMesa**: Ponteiro para o baralho de mesa.
+- **bCompra**: Ponteiro para o baralho de compra.
+- **cicloJogadores**: Ponteiro para a lista circular de jogadores.
 
 ## Funções
+
 ### Função: criarBaralho
 
 A função `criarBaralho` aloca dinamicamente memória para uma nova estrutura `Baralho` e a inicializa.
@@ -668,66 +730,3 @@ A função não retorna nenhum valor.
 - Verifica se o ponteiro `manilha` e a carta atual não são nulos.
 - Se ambos não forem nulos, imprime os detalhes da carta atual, incluindo sua categoria e número.
 - Se `manilha` ou a carta atual forem nulos, imprime uma mensagem de erro indicando que a carta está vazia.
-
-## Estruturas
-
-### Estrutura: NoCarta:
-Estrutura que representa uma carta do baralho.
-
-- **numero**: Enumeração que representa o número da carta.
-- **categoria**: Caractere que representa a categoria da carta.
-- **ant**: Ponteiro para o nó anterior na lista duplamente encadeada.
-- **prox**: Ponteiro para o próximo nó na lista duplamente encadeada.
-
-### Estrutura: Manilha:
-Estrutura que representa a pilha de cartas de manilha de um jogador.
-
-- **qtd**: Número inteiro que representa a quantidade de cartas na pilha.
-- **mAtual**: Ponteiro para a carta atual de manilha na pilha.
-- **inicioAzul**: Ponteiro para a carta inicial da cor Azul.
-- **inicioVermelho**: Ponteiro para a carta inicial da cor Vermelha.
-- **inicioVerde**: Ponteiro para a carta inicial da cor Verde.
-- **inicioAmarelo**: Ponteiro para a carta inicial da cor Amarela.
-- **inicioCuringa**: Ponteiro para a carta inicial de Curinga.
-
-### Estrutura: Perfil:
-Estrutura que armazena o perfil de um jogador.
-
-- **nome**: Array de caracteres que armazena o nome do jogador.
-- **wins**: Número inteiro que representa o número de vitórias do jogador.
-
-### Estrutura: Settings:
-Estrutura que armazena as configurações do jogo.
-
-- **ordem**: Array de caracteres que representa a ordem das cores das cartas.
-
-### Estrutura: NoJogador:
-Estrutura que representa um jogador no jogo.
-
-- **manilha**: Ponteiro para a pilha de manilha do jogador.
-- **perfil**: Ponteiro para o perfil do jogador.
-- **isBot**: Booleano que indica se o jogador é um bot.
-- **ant**: Ponteiro para o jogador anterior na lista circular de jogadores.
-- **prox**: Ponteiro para o próximo jogador na lista circular de jogadores.
-- **isUno**: Booleano que indica se o jogador disse "Uno".
-
-### Estrutura: ListaJogadorCircular:
-Estrutura que representa a lista circular de jogadores.
-
-- **jAtual**: Ponteiro para o jogador atual na lista.
-- **qtdJogadores**: Número inteiro que representa a quantidade de jogadores na lista.
-- **qtdJogadas**: Número inteiro que representa a quantidade de jogadas realizadas.
-- **isInverso**: Booleano que indica se o sentido da lista está invertido.
-
-### Estrutura: Baralho:
-Estrutura que representa o baralho de cartas.
-
-- **cartas**: Array de ponteiros para as cartas do baralho.
-- **topo**: Índice inteiro que representa o topo do baralho.
-
-### Estrutura: Jogo:
-Estrutura principal que representa o estado do jogo.
-
-- **bMesa**: Ponteiro para o baralho de mesa.
-- **bCompra**: Ponteiro para o baralho de compra.
-- **cicloJogadores**: Ponteiro para a lista circular de jogadores.
