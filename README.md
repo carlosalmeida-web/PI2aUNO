@@ -37,7 +37,7 @@ Estrutura que armazena as configurações do jogo.
 - **ordem**: Array de caracteres que representa a ordem das cores das cartas.
 
 ### Estrutura: NoJogador:
-Estrutura que representa um jogador no jogo.
+Estrutura que representa um jogador no jogo
 
 - **manilha**: Ponteiro para a pilha de manilha do jogador.
 - **perfil**: Ponteiro para o perfil do jogador.
