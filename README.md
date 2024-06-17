@@ -39,7 +39,7 @@ Estrutura que armazena as configurações do jogo.
 ### Estrutura: NoJogador:
 Estrutura que representa um jogador no jogo.
 
-- **manilha**: Ponteiro para a pilha de manilha do jogador.
+- **manilha**: Ponteiro para a lista duplamente encadeada circular da manilha do jogador.
 - **perfil**: Ponteiro para o perfil do jogador.
 - **isBot**: Booleano que indica se o jogador é um bot.
 - **ant**: Ponteiro para o jogador anterior na lista circular de jogadores.
